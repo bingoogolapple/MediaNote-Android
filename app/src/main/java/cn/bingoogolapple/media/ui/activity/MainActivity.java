@@ -8,14 +8,14 @@ import android.support.v4.view.ViewPager;
 
 import cn.bingoogolapple.bgaindicator.BGAFixedIndicator;
 import cn.bingoogolapple.media.R;
-import cn.bingoogolapple.media.ui.fragment.MovieFragment;
-import cn.bingoogolapple.media.ui.fragment.MusicFragment;
+import cn.bingoogolapple.media.ui.fragment.VideoFragment;
+import cn.bingoogolapple.media.ui.fragment.AudioFragment;
 
 public class MainActivity extends BaseActivity {
     private BGAFixedIndicator mIndicator;
     private ViewPager mContentVp;
-    private MusicFragment mMusicFragment;
-    private MovieFragment mMovieFragment;
+    private AudioFragment mAudioFragment;
+    private VideoFragment mVideoFragment;
 
     @Override
     protected void initView(Bundle savedInstanceState) {
@@ -44,15 +44,15 @@ public class MainActivity extends BaseActivity {
         public Fragment getItem(int position) {
             switch (position) {
                 case 0:
-                    if (mMusicFragment == null) {
-                        mMusicFragment = new MusicFragment();
+                    if (mAudioFragment == null) {
+                        mAudioFragment = new AudioFragment();
                     }
-                    return mMusicFragment;
+                    return mAudioFragment;
                 case 1:
-                    if (mMovieFragment == null) {
-                        mMovieFragment = new MovieFragment();
+                    if (mVideoFragment == null) {
+                        mVideoFragment = new VideoFragment();
                     }
-                    return mMovieFragment;
+                    return mVideoFragment;
                 default:
                     return null;
             }

@@ -6,27 +6,30 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewGroup;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import cn.bingoogolapple.androidcommon.adapter.BGAOnRVItemClickListener;
 import cn.bingoogolapple.androidcommon.adapter.BGARecyclerViewAdapter;
 import cn.bingoogolapple.androidcommon.adapter.BGAViewHolderHelper;
 import cn.bingoogolapple.media.R;
+import cn.bingoogolapple.media.engine.MediaScanner;
+import cn.bingoogolapple.media.model.MediaFile;
 import cn.bingoogolapple.media.ui.widget.Divider;
+import cn.bingoogolapple.media.util.ThreadUtil;
 
 /**
  * 作者:王浩 邮件:bingoogolapple@gmail.com
  * 创建时间:15/9/7 下午5:18
  * 描述:
  */
-public class MusicFragment extends BaseFragment implements BGAOnRVItemClickListener {
+public class AudioFragment extends BaseFragment implements BGAOnRVItemClickListener {
     private RecyclerView mDataRv;
     private MusicAdapter mMusicAdapter;
 
     @Override
     protected void initView(Bundle savedInstanceState) {
-        setContentView(R.layout.fragment_music);
-        mDataRv = getViewById(R.id.rv_music_data);
+        setContentView(R.layout.fragment_audio);
+        mDataRv = getViewById(R.id.rv_audio_data);
     }
 
     @Override
@@ -43,11 +46,22 @@ public class MusicFragment extends BaseFragment implements BGAOnRVItemClickListe
         mDataRv.addItemDecoration(new Divider(mActivity));
         mDataRv.setAdapter(mMusicAdapter);
 
-        ArrayList<String> datas = new ArrayList<>();
-        datas.add("音乐1");
-        datas.add("音乐2");
-        datas.add("音乐3");
-        mMusicAdapter.setDatas(datas);
+        reloadData();
+    }
+
+    private void reloadData() {
+        ThreadUtil.runInThread(new Runnable() {
+            @Override
+            public void run() {
+                final List<MediaFile> mediaFiles = MediaScanner.scanAudio();
+                ThreadUtil.runInUIThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        mMusicAdapter.setDatas(mediaFiles);
+                    }
+                });
+            }
+        });
     }
 
     @Override
@@ -55,15 +69,15 @@ public class MusicFragment extends BaseFragment implements BGAOnRVItemClickListe
 
     }
 
-    private final class MusicAdapter extends BGARecyclerViewAdapter<String> {
+    private final class MusicAdapter extends BGARecyclerViewAdapter<MediaFile> {
 
         public MusicAdapter(RecyclerView recyclerView) {
             super(recyclerView, R.layout.item_music);
         }
 
         @Override
-        protected void fillData(BGAViewHolderHelper helper, int position, String model) {
-            helper.setText(R.id.tv_item_music_name, model);
+        protected void fillData(BGAViewHolderHelper helper, int position, MediaFile model) {
+            helper.setText(R.id.tv_item_music_name, model.name);
         }
     }
 }
