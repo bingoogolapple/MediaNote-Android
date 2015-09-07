@@ -1,0 +1,26 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    style="@style/MatchMatch.Vertical"
+    android:layout_width="match_parent">
+
+    <cn.bingoogolapple.bgaindicator.BGAFixedIndicator
+        android:id="@+id/indicator"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:background="@color/white"
+        app:indicator_dividerColor="@android:color/transparent"
+        app:indicator_dividerVerticalMargin="@dimen/size_level2"
+        app:indicator_dividerWidth="2dp"
+        app:indicator_hasDivider="true"
+        app:indicator_textColor="@color/selector_orange"
+        app:indicator_textSizeNormal="@dimen/textSize_16"
+        app:indicator_textSizeSelected="@dimen/textSize_18"
+        app:indicator_triangleColor="@color/orange_pressed"
+        app:indicator_triangleHeight="2dp"
+        app:indicator_triangleHorizontalMargin="@dimen/size_level2" />
+
+    <android.support.v4.view.ViewPager
+        android:id="@+id/vp_main_content"
+        style="@style/MatchAuto" />
+
+</LinearLayout>

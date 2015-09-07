@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">MediaNote</string>
+    <string name="toast_exit_tip">再按一次返回键退出应用程序</string>
+    <string name="back">返回</string>
+    <string name="next_step">下一步</string>
+
+</resources>

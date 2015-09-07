@@ -1,0 +1,16 @@
+<resources>
+
+    <style name="AppTheme" parent="AppBaseTheme">
+        <!--colorPrimaryDark对应状态栏的颜色-->
+        <item name="colorPrimaryDark">@android:color/black</item>
+        <item name="android:navigationBarColor">@android:color/black</item>
+    </style>
+
+    <style name="TransparentTheme" parent="AppBaseTransparentTheme">
+        <item name="colorPrimaryDark">@android:color/black</item>
+        <item name="android:navigationBarColor">@android:color/black</item>
+    </style>
+
+    <style name="TransparentTheme.Splash"/>
+
+</resources>

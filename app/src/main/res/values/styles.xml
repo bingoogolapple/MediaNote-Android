@@ -1,0 +1,40 @@
+<resources>
+
+    <style name="AppBaseTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <!--colorPrimary对应ActionBar的颜色-->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="android:windowBackground">@color/windowBackground</item>
+        <!--colorAccent 对应EditText编辑时、RadioButton选中、CheckBox等选中时的颜色-->
+        <item name="colorAccent">@color/colorAccent</item>
+    </style>
+
+    <style name="AppBaseTransparentTheme" parent="AppBaseTheme">
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:colorBackgroundCacheHint">@null</item>
+        <item name="android:windowIsTranslucent">true</item>
+    </style>
+
+    <style name="AppTheme" parent="AppBaseTheme" />
+
+    <style name="TransparentTheme" parent="AppBaseTransparentTheme" />
+
+    <style name="TransparentTheme.Splash" />
+
+    <style name="TitleBar">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">@dimen/titlebar_height</item>
+        <item name="android:background">@drawable/layer_titlebar_bg</item>
+        <item name="bgatitlebar_leftAndRightTextColor">@color/selector_orange</item>
+        <item name="bgatitlebar_leftAndRightTextSize">@dimen/textSize_18</item>
+        <item name="bgatitlebar_titleTextColor">@color/black_dark</item>
+        <item name="bgatitlebar_titleTextSize">@dimen/textSize_18</item>
+        <item name="bgatitlebar_leftAndRightPadding">@dimen/size_level2</item>
+    </style>
+
+    <style name="TitleBar.Back">
+        <item name="bgatitlebar_leftDrawable">@drawable/selector_back</item>
+        <item name="bgatitlebar_leftText">@string/back</item>
+        <item name="bgatitlebar_leftDrawablePadding">@dimen/size_level1</item>
+    </style>
+
+</resources>
