@@ -1,9 +1,11 @@
 package cn.bingoogolapple.media.engine;
 
 import android.database.Cursor;
+import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.provider.MediaStore;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,7 +17,7 @@ import cn.bingoogolapple.media.model.MediaFile;
  * 创建时间:15/9/7 下午11:00
  * 描述:
  */
-public class MediaScanner {
+public class MediaScanner implements MediaScannerConnection.MediaScannerConnectionClient {
     private static String AUDIO_PATH = MediaStore.Audio.AudioColumns.DATA;
     private static String AUDIO_TITLE = MediaStore.Audio.AudioColumns.TITLE;
     private static String AUDIO_SIZE = MediaStore.Audio.AudioColumns.SIZE;
@@ -28,7 +30,26 @@ public class MediaScanner {
     private static String VIDEO_DURATION = MediaStore.Video.VideoColumns.DURATION;
     private static String VIDEO_PROJECTION[] = {VIDEO_PATH, VIDEO_TITLE, VIDEO_SIZE, VIDEO_DURATION};
 
-    private MediaScanner() {
+    private MediaScannerConnection mMs;
+    private File mFile;
+
+    public void startScan(File file) {
+        if (mMs != null) {
+            mMs.disconnect();
+        }
+        mFile = file;
+        mMs = new MediaScannerConnection(App.getInstance(), this);
+        mMs.connect();
+    }
+
+    @Override
+    public void onMediaScannerConnected() {
+        mMs.scanFile(mFile.getAbsolutePath(), null);
+    }
+
+    @Override
+    public void onScanCompleted(String path, Uri uri) {
+        mMs.disconnect();
     }
 
     public static List<MediaFile> scanAudio() {
