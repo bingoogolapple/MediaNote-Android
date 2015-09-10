@@ -3,7 +3,6 @@ package cn.bingoogolapple.media.ui.activity;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
-import android.widget.MediaController;
 import android.widget.VideoView;
 
 import cn.bingoogolapple.media.R;
@@ -33,7 +32,7 @@ public class VideoActivity extends BaseActivity {
                 mVideoView.start();
             }
         });
-        mVideoView.setMediaController(new MediaController(this));
+//        mVideoView.setMediaController(new MediaController(this));
     }
 
     @Override
