@@ -1,9 +1,6 @@
 package cn.bingoogolapple.media.ui.activity;
 
-import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.widget.TextView;
 
 import cn.bingoogolapple.media.R;
@@ -30,7 +27,14 @@ public class SplashActivity extends BaseActivity {
         TextView versionTv = getViewById(R.id.tv_splash_version);
         versionTv.setText("V" + mApp.getCurrentVersionName());
 
-        fireSDCard();
+        ThreadUtil.runInThread(new Runnable() {
+            @Override
+            public void run() {
+//                MediaScanner.scanFolder(Environment.getExternalStorageDirectory().getAbsolutePath());
+//                MediaScanner.scanFolder("/storage/emulated/0/testmedia");
+//                MediaScanner.scanFile("/storage/emulated/0/testmedia/music1.mp3");
+            }
+        });
 
         ThreadUtil.runInUIThread(new Runnable() {
             @Override
@@ -40,7 +44,4 @@ public class SplashActivity extends BaseActivity {
         }, 1500);
     }
 
-    private void fireSDCard() {
-        sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.parse("file://" + Environment.getExternalStorageDirectory())));
-    }
 }

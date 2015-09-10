@@ -1,7 +1,7 @@
 package cn.bingoogolapple.media.engine;
 
+import android.content.Intent;
 import android.database.Cursor;
-import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.provider.MediaStore;
 
@@ -17,7 +17,7 @@ import cn.bingoogolapple.media.model.MediaFile;
  * 创建时间:15/9/7 下午11:00
  * 描述:
  */
-public class MediaScanner implements MediaScannerConnection.MediaScannerConnectionClient {
+public class MediaScanner {
     private static String AUDIO_PATH = MediaStore.Audio.AudioColumns.DATA;
     private static String AUDIO_TITLE = MediaStore.Audio.AudioColumns.TITLE;
     private static String AUDIO_SIZE = MediaStore.Audio.AudioColumns.SIZE;
@@ -30,26 +30,25 @@ public class MediaScanner implements MediaScannerConnection.MediaScannerConnecti
     private static String VIDEO_DURATION = MediaStore.Video.VideoColumns.DURATION;
     private static String VIDEO_PROJECTION[] = {VIDEO_PATH, VIDEO_TITLE, VIDEO_SIZE, VIDEO_DURATION};
 
-    private MediaScannerConnection mMs;
-    private File mFile;
-
-    public void startScan(File file) {
-        if (mMs != null) {
-            mMs.disconnect();
+    public static void scanFolder(String filePath) {
+        File inputFile = new File(filePath);
+        if (inputFile.isDirectory()) {
+            File[] files = inputFile.listFiles();
+            for (int i = 0; i < files.length; i++) {
+                File file = files[i];
+                if (file.isFile()) {
+                    scanFile(file.getAbsolutePath());
+                } else {
+                    scanFolder(file.getAbsolutePath());
+                }
+            }
+        } else {
+            scanFile(filePath);
         }
-        mFile = file;
-        mMs = new MediaScannerConnection(App.getInstance(), this);
-        mMs.connect();
     }
 
-    @Override
-    public void onMediaScannerConnected() {
-        mMs.scanFile(mFile.getAbsolutePath(), null);
-    }
-
-    @Override
-    public void onScanCompleted(String path, Uri uri) {
-        mMs.disconnect();
+    public static void scanFile(String filePath) {
+        App.getInstance().sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.parse("file://" + filePath)));
     }
 
     public static List<MediaFile> scanAudio() {

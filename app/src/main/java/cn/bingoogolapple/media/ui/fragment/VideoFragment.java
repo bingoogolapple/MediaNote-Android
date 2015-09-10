@@ -1,8 +1,13 @@
 package cn.bingoogolapple.media.ui.fragment;
 
+import android.database.ContentObserver;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.provider.MediaStore;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.format.Formatter;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -16,6 +21,7 @@ import cn.bingoogolapple.media.engine.MediaScanner;
 import cn.bingoogolapple.media.model.MediaFile;
 import cn.bingoogolapple.media.ui.widget.Divider;
 import cn.bingoogolapple.media.util.ThreadUtil;
+import cn.bingoogolapple.media.util.StringUtil;
 
 /**
  * 作者:王浩 邮件:bingoogolapple@gmail.com
@@ -25,6 +31,7 @@ import cn.bingoogolapple.media.util.ThreadUtil;
 public class VideoFragment extends BaseFragment implements BGAOnRVItemClickListener {
     private RecyclerView mDataRv;
     private MovieAdapter mMovieAdapter;
+    private VideoContentObserver mVideoContentObserver;
 
     @Override
     protected void initView(Bundle savedInstanceState) {
@@ -40,6 +47,7 @@ public class VideoFragment extends BaseFragment implements BGAOnRVItemClickListe
 
     @Override
     protected void processLogic(Bundle savedInstanceState) {
+        registerVideoContentObserver();
         LinearLayoutManager layoutManager = new LinearLayoutManager(mActivity);
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         mDataRv.setLayoutManager(layoutManager);
@@ -65,6 +73,21 @@ public class VideoFragment extends BaseFragment implements BGAOnRVItemClickListe
     }
 
     @Override
+    public void onDestroy() {
+        unregisterVideoContentObserver();
+        super.onDestroy();
+    }
+
+    private void registerVideoContentObserver() {
+        mVideoContentObserver = new VideoContentObserver(new Handler());
+        mActivity.getContentResolver().registerContentObserver(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, true, mVideoContentObserver);
+    }
+
+    private void unregisterVideoContentObserver() {
+        mActivity.getContentResolver().unregisterContentObserver(mVideoContentObserver);
+    }
+
+    @Override
     public void onRVItemClick(ViewGroup viewGroup, View view, int position) {
 
     }
@@ -72,12 +95,27 @@ public class VideoFragment extends BaseFragment implements BGAOnRVItemClickListe
     private final class MovieAdapter extends BGARecyclerViewAdapter<MediaFile> {
 
         public MovieAdapter(RecyclerView recyclerView) {
-            super(recyclerView, R.layout.item_movie);
+            super(recyclerView, R.layout.item_video);
         }
 
         @Override
         protected void fillData(BGAViewHolderHelper helper, int position, MediaFile model) {
-            helper.setText(R.id.tv_item_movie_name, model.name);
+            helper.setText(R.id.tv_item_video_name, model.name);
+            helper.setText(R.id.tv_item_video_size, Formatter.formatFileSize(mContext, model.size));
+            helper.setText(R.id.tv_item_video_duration, StringUtil.formatTime(model.duration));
+        }
+    }
+
+    private final class VideoContentObserver extends ContentObserver {
+
+        public VideoContentObserver(Handler handler) {
+            super(handler);
+        }
+
+        @Override
+        public void onChange(boolean selfChange, Uri uri) {
+            super.onChange(selfChange, uri);
+            reloadData();
         }
     }
 }
