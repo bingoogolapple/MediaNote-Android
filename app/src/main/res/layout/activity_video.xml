@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    style="@style/MatchMatch.Vertical"
+    android:background="@android:color/black">
+
+    <VideoView
+        android:id="@+id/videoView"
+        style="@style/MatchMatch"
+        android:layout_gravity="center_horizontal" />
+
+</LinearLayout>

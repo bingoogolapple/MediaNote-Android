@@ -1,5 +1,6 @@
 package cn.bingoogolapple.media.ui.fragment;
 
+import android.content.Intent;
 import android.database.ContentObserver;
 import android.net.Uri;
 import android.os.Bundle;
@@ -19,6 +20,7 @@ import cn.bingoogolapple.androidcommon.adapter.BGAViewHolderHelper;
 import cn.bingoogolapple.media.R;
 import cn.bingoogolapple.media.engine.MediaScanner;
 import cn.bingoogolapple.media.model.MediaFile;
+import cn.bingoogolapple.media.ui.activity.VideoActivity;
 import cn.bingoogolapple.media.ui.widget.Divider;
 import cn.bingoogolapple.media.util.ThreadUtil;
 import cn.bingoogolapple.media.util.StringUtil;
@@ -89,7 +91,9 @@ public class VideoFragment extends BaseFragment implements BGAOnRVItemClickListe
 
     @Override
     public void onRVItemClick(ViewGroup viewGroup, View view, int position) {
-
+        Intent intent = new Intent(mActivity, VideoActivity.class);
+        intent.putExtra(VideoActivity.EXTRA_MEDIA_FILE, mMovieAdapter.getItem(position));
+        mActivity.forward(intent);
     }
 
     private final class MovieAdapter extends BGARecyclerViewAdapter<MediaFile> {

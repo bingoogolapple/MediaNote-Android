@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.widget.TextView;
 
 import cn.bingoogolapple.media.R;
+import cn.bingoogolapple.media.engine.MediaScanner;
 import cn.bingoogolapple.media.util.ThreadUtil;
 
 /**
@@ -31,7 +32,7 @@ public class SplashActivity extends BaseActivity {
             @Override
             public void run() {
 //                MediaScanner.scanFolder(Environment.getExternalStorageDirectory().getAbsolutePath());
-//                MediaScanner.scanFolder("/storage/emulated/0/testmedia");
+                MediaScanner.scanFolder("/storage/emulated/0/testmedia");
 //                MediaScanner.scanFile("/storage/emulated/0/testmedia/music1.mp3");
             }
         });
