@@ -1,5 +1,8 @@
 package cn.bingoogolapple.media.util;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 /**
  * 作者:王浩 邮件:bingoogolapple@gmail.com
  * 创建时间:15/9/10 上午10:22
@@ -28,5 +31,9 @@ public class StringUtil {
         } else {
             return String.format("%02d:%02d:%02d", hour, minute, second);
         }
+    }
+
+    public static String formatSystemTime() {
+        return new SimpleDateFormat("HH:mm:ss").format(new Date());
     }
 }
