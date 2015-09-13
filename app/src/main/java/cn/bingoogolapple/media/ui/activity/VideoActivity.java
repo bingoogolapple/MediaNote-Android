@@ -35,7 +35,9 @@ public class VideoActivity extends BaseActivity {
     private ImageView mBatteryIv;
     private TextView mSystimeTv;
     private SeekBar mVolumnSb;
-    private int mMaxVolume;
+    private ImageView mVolumnIv;
+    private int mCurrentVolume;
+    private boolean mIsMute;
 
     private ImageView mExitIv;
     private ImageView mPreIv;
@@ -62,6 +64,7 @@ public class VideoActivity extends BaseActivity {
         mNameTv = getViewById(R.id.tv_video_name);
         mBatteryIv = getViewById(R.id.iv_video_battery);
         mSystimeTv = getViewById(R.id.tv_video_systime);
+        mVolumnIv = getViewById(R.id.iv_video_voice);
         mVolumnSb = getViewById(R.id.sb_video_volumn);
 
         mExitIv = getViewById(R.id.iv_video_exit);
@@ -81,6 +84,7 @@ public class VideoActivity extends BaseActivity {
                 updatePlayIvImageResource();
             }
         });
+        mVolumnIv.setOnClickListener(this);
         mExitIv.setOnClickListener(this);
         mPreIv.setOnClickListener(this);
         mPlayIv.setOnClickListener(this);
@@ -94,8 +98,9 @@ public class VideoActivity extends BaseActivity {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 if (fromUser) {
-                    // flag为1时会显示音量变化的悬浮窗口，使用0就好
-                    mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, progress, 0);
+                    mIsMute = false;
+                    mCurrentVolume = progress;
+                    updateVolumn();
                 }
             }
 
@@ -121,7 +126,19 @@ public class VideoActivity extends BaseActivity {
     private void initVolumn() {
         mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
         mVolumnSb.setMax(mAudioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC));
-        mVolumnSb.setProgress(mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC));
+        mCurrentVolume = mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
+        updateVolumn();
+    }
+
+    private void updateVolumn() {
+        // flag为1时会显示音量变化的悬浮窗口，使用0就好
+        if (mIsMute) {
+            mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, 0, 0);
+            mVolumnSb.setProgress(0);
+        } else {
+            mVolumnSb.setProgress(mCurrentVolume);
+            mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, mCurrentVolume, 0);
+        }
     }
 
     private void registerBatteryBroadcastReceiver() {
@@ -132,6 +149,10 @@ public class VideoActivity extends BaseActivity {
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
+            case R.id.iv_video_voice:
+                mIsMute = !mIsMute;
+                updateVolumn();
+                break;
             case R.id.iv_video_exit:
                 backward();
                 break;
