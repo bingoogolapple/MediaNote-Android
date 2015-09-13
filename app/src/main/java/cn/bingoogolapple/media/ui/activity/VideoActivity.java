@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
@@ -11,6 +12,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.VideoView;
 
@@ -32,12 +34,17 @@ public class VideoActivity extends BaseActivity {
     private TextView mNameTv;
     private ImageView mBatteryIv;
     private TextView mSystimeTv;
+    private SeekBar mVolumnSb;
+    private int mMaxVolume;
 
     private ImageView mExitIv;
     private ImageView mPreIv;
     private ImageView mPlayIv;
     private ImageView mNextIv;
     private ImageView mScreenIv;
+    private SeekBar mProgressSb;
+
+    private AudioManager mAudioManager;
 
     private BatteryBroadcastReceiver mBatteryBroadcastReceiver;
 
@@ -55,12 +62,14 @@ public class VideoActivity extends BaseActivity {
         mNameTv = getViewById(R.id.tv_video_name);
         mBatteryIv = getViewById(R.id.iv_video_battery);
         mSystimeTv = getViewById(R.id.tv_video_systime);
+        mVolumnSb = getViewById(R.id.sb_video_volumn);
 
         mExitIv = getViewById(R.id.iv_video_exit);
         mPreIv = getViewById(R.id.iv_video_pre);
         mPlayIv = getViewById(R.id.iv_video_play);
         mNextIv = getViewById(R.id.iv_video_next);
         mScreenIv = getViewById(R.id.iv_video_screen);
+        mProgressSb = getViewById(R.id.sb_video_progress);
     }
 
     @Override
@@ -77,6 +86,23 @@ public class VideoActivity extends BaseActivity {
         mPlayIv.setOnClickListener(this);
         mNextIv.setOnClickListener(this);
         mScreenIv.setOnClickListener(this);
+        mVolumnSb.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+            }
+
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                if (fromUser) {
+                    // flag为1时会显示音量变化的悬浮窗口，使用0就好
+                    mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, progress, 0);
+                }
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+            }
+        });
     }
 
     @Override
@@ -88,6 +114,14 @@ public class VideoActivity extends BaseActivity {
         mNameTv.setText(mMediaFile.name);
 
         updateSystime();
+
+        initVolumn();
+    }
+
+    private void initVolumn() {
+        mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+        mVolumnSb.setMax(mAudioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC));
+        mVolumnSb.setProgress(mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC));
     }
 
     private void registerBatteryBroadcastReceiver() {
