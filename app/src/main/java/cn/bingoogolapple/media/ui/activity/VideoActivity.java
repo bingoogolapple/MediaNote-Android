@@ -243,6 +243,7 @@ public class VideoActivity extends BaseActivity {
     private void updateProgress() {
         mProgressSb.setProgress(mVideoView.getCurrentPosition());
         mHandler.sendEmptyMessageDelayed(WHAT_UPDATE_PROGRESS, 1000);
+        mCurrentTimeTv.setText(StringUtil.formatTime(mVideoView.getCurrentPosition()));
         Logger.i(TAG, "修改进度");
     }
 

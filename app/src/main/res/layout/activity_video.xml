@@ -71,9 +71,9 @@
             android:padding="@dimen/size_level1">
 
             <TextView
-                android:id="@+id/tv_video_totleTime"
+                android:id="@+id/tv_video_currentTime"
                 style="@style/WrapWrap"
-                android:text="03:20"
+                android:text="00:00"
                 android:textColor="@color/white"
                 android:textSize="@dimen/textSize_12" />
 
@@ -87,9 +87,9 @@
                 android:thumb="@mipmap/progress_thumb" />
 
             <TextView
-                android:id="@+id/tv_video_currentTime"
+                android:id="@+id/tv_video_totleTime"
                 style="@style/WrapWrap"
-                android:text="03:10"
+                android:text="00:00"
                 android:textColor="@color/white"
                 android:textSize="@dimen/textSize_12" />
         </LinearLayout>
