@@ -10,6 +10,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.SeekBar;
@@ -20,6 +21,7 @@ import cn.bingoogolapple.media.R;
 import cn.bingoogolapple.media.model.MediaFile;
 import cn.bingoogolapple.media.util.Logger;
 import cn.bingoogolapple.media.util.StringUtil;
+import cn.bingoogolapple.media.util.UIUtil;
 
 /**
  * 作者:王浩 邮件:bingoogolapple@gmail.com
@@ -37,6 +39,7 @@ public class VideoActivity extends BaseActivity {
     private SeekBar mVolumnSb;
     private ImageView mVolumnIv;
     private int mCurrentVolume;
+    private int mMaxVolumn;
     private boolean mIsMute;
 
     private ImageView mExitIv;
@@ -49,6 +52,8 @@ public class VideoActivity extends BaseActivity {
     private AudioManager mAudioManager;
 
     private BatteryBroadcastReceiver mBatteryBroadcastReceiver;
+
+    private float mDownY;
 
     private Handler mHandler = new Handler() {
         @Override
@@ -125,7 +130,8 @@ public class VideoActivity extends BaseActivity {
 
     private void initVolumn() {
         mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
-        mVolumnSb.setMax(mAudioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC));
+        mMaxVolumn = mAudioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
+        mVolumnSb.setMax(mMaxVolumn);
         mCurrentVolume = mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
         updateVolumn();
     }
@@ -229,5 +235,38 @@ public class VideoActivity extends BaseActivity {
         } else {
             mBatteryIv.setImageResource(R.mipmap.ic_battery_100);
         }
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        switch (event.getAction()) {
+            case MotionEvent.ACTION_DOWN:
+                mDownY = event.getY();
+                break;
+            case MotionEvent.ACTION_MOVE:
+                float currentY = event.getY();
+                float moveDistance = currentY - mDownY;
+                if (Math.abs(moveDistance) > UIUtil.dp2px(this, 5)) {
+                    mIsMute = false;
+                    if (moveDistance < 0) {
+                        mCurrentVolume += 1;
+                    } else if (moveDistance > 0) {
+                        mCurrentVolume -= 1;
+                    }
+                    if (mCurrentVolume < 0) {
+                        mCurrentVolume = 0;
+                    } else if (mCurrentVolume > mMaxVolumn) {
+                        mCurrentVolume = mMaxVolumn;
+                    }
+                    updateVolumn();
+                }
+
+                mDownY = currentY;
+                break;
+            case MotionEvent.ACTION_UP:
+
+                break;
+        }
+        return super.onTouchEvent(event);
     }
 }
