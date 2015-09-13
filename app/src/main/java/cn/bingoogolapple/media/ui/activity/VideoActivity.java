@@ -31,6 +31,7 @@ import cn.bingoogolapple.media.util.UIUtil;
 public class VideoActivity extends BaseActivity {
     public static final String EXTRA_MEDIA_FILE = "EXTRA_MEDIA_FILE";
     private static final int WHAT_UPDATE_SYSTIME = 0;
+    private static final int WHAT_UPDATE_PROGRESS = 1;
     private VideoView mVideoView;
     private MediaFile mMediaFile;
     private TextView mNameTv;
@@ -48,6 +49,8 @@ public class VideoActivity extends BaseActivity {
     private ImageView mNextIv;
     private ImageView mScreenIv;
     private SeekBar mProgressSb;
+    private TextView mCurrentTimeTv;
+    private TextView mTotalTimeTv;
 
     private AudioManager mAudioManager;
 
@@ -58,7 +61,14 @@ public class VideoActivity extends BaseActivity {
     private Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
-            updateSystime();
+            switch (msg.what) {
+                case WHAT_UPDATE_PROGRESS:
+                    updateProgress();
+                    break;
+                case WHAT_UPDATE_SYSTIME:
+                    updateSystime();
+                    break;
+            }
         }
     };
 
@@ -78,6 +88,8 @@ public class VideoActivity extends BaseActivity {
         mNextIv = getViewById(R.id.iv_video_next);
         mScreenIv = getViewById(R.id.iv_video_screen);
         mProgressSb = getViewById(R.id.sb_video_progress);
+        mTotalTimeTv = getViewById(R.id.tv_video_totleTime);
+        mCurrentTimeTv = getViewById(R.id.tv_video_currentTime);
     }
 
     @Override
@@ -87,6 +99,9 @@ public class VideoActivity extends BaseActivity {
             public void onPrepared(MediaPlayer mp) {
                 mVideoView.start();
                 updatePlayIvImageResource();
+
+                mProgressSb.setMax(mMediaFile.duration);
+                updateProgress();
             }
         });
         mVolumnIv.setOnClickListener(this);
@@ -113,6 +128,22 @@ public class VideoActivity extends BaseActivity {
             public void onStopTrackingTouch(SeekBar seekBar) {
             }
         });
+        mProgressSb.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                if (fromUser) {
+                    mVideoView.seekTo(progress);
+                }
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+            }
+        });
     }
 
     @Override
@@ -122,6 +153,9 @@ public class VideoActivity extends BaseActivity {
         mMediaFile = getIntent().getParcelableExtra(EXTRA_MEDIA_FILE);
         mVideoView.setVideoURI(Uri.parse(mMediaFile.path));
         mNameTv.setText(mMediaFile.name);
+
+
+        mTotalTimeTv.setText(StringUtil.formatTime(mMediaFile.duration));
 
         updateSystime();
 
@@ -168,8 +202,10 @@ public class VideoActivity extends BaseActivity {
             case R.id.iv_video_play:
                 if (mVideoView.isPlaying()) {
                     mVideoView.pause();
+                    mHandler.removeMessages(WHAT_UPDATE_PROGRESS);
                 } else {
                     mVideoView.start();
+                    updateProgress();
                 }
                 updatePlayIvImageResource();
                 break;
@@ -185,6 +221,7 @@ public class VideoActivity extends BaseActivity {
     @Override
     protected void onDestroy() {
         mHandler.removeMessages(WHAT_UPDATE_SYSTIME);
+        mHandler.removeMessages(WHAT_UPDATE_PROGRESS);
         unregisterReceiver(mBatteryBroadcastReceiver);
         super.onDestroy();
     }
@@ -201,6 +238,12 @@ public class VideoActivity extends BaseActivity {
         mSystimeTv.setText(StringUtil.formatSystemTime());
         mHandler.sendEmptyMessageDelayed(WHAT_UPDATE_SYSTIME, 1000);
         Logger.i(TAG, "修改系统时间");
+    }
+
+    private void updateProgress() {
+        mProgressSb.setProgress(mVideoView.getCurrentPosition());
+        mHandler.sendEmptyMessageDelayed(WHAT_UPDATE_PROGRESS, 1000);
+        Logger.i(TAG, "修改进度");
     }
 
     private class BatteryBroadcastReceiver extends BroadcastReceiver {
