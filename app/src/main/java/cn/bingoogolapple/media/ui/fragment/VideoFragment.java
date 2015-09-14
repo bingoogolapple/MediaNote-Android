@@ -5,6 +5,7 @@ import android.database.ContentObserver;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Parcelable;
 import android.provider.MediaStore;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -12,6 +13,7 @@ import android.text.format.Formatter;
 import android.view.View;
 import android.view.ViewGroup;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import cn.bingoogolapple.androidcommon.adapter.BGAOnRVItemClickListener;
@@ -92,7 +94,8 @@ public class VideoFragment extends BaseFragment implements BGAOnRVItemClickListe
     @Override
     public void onRVItemClick(ViewGroup viewGroup, View view, int position) {
         Intent intent = new Intent(mActivity, VideoActivity.class);
-        intent.putExtra(VideoActivity.EXTRA_MEDIA_FILE, mMovieAdapter.getItem(position));
+        intent.putExtra(VideoActivity.EXTRA_CURRENT_MEDIA_FILE_POSITION, position);
+        intent.putParcelableArrayListExtra(VideoActivity.EXTRA_MEDIA_FILES, (ArrayList<? extends Parcelable>) mMovieAdapter.getDatas());
         mActivity.forward(intent);
     }
 

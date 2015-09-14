@@ -17,6 +17,8 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.VideoView;
 
+import java.util.List;
+
 import cn.bingoogolapple.media.R;
 import cn.bingoogolapple.media.model.MediaFile;
 import cn.bingoogolapple.media.util.Logger;
@@ -29,11 +31,14 @@ import cn.bingoogolapple.media.util.UIUtil;
  * 描述:
  */
 public class VideoActivity extends BaseActivity {
-    public static final String EXTRA_MEDIA_FILE = "EXTRA_MEDIA_FILE";
+    public static final String EXTRA_MEDIA_FILES = "EXTRA_MEDIA_FILES";
+    public static final String EXTRA_CURRENT_MEDIA_FILE_POSITION = "EXTRA_CURRENT_MEDIA_FILE_POSITION";
     private static final int WHAT_UPDATE_SYSTIME = 0;
     private static final int WHAT_UPDATE_PROGRESS = 1;
     private VideoView mVideoView;
-    private MediaFile mMediaFile;
+    private List<MediaFile> mMediaFiles;
+    private MediaFile mCurrentMediaFile;
+    private int mCurrentMediaFilePosition;
     private TextView mNameTv;
     private ImageView mBatteryIv;
     private TextView mSystimeTv;
@@ -100,8 +105,21 @@ public class VideoActivity extends BaseActivity {
                 mVideoView.start();
                 updatePlayIvImageResource();
 
-                mProgressSb.setMax(mMediaFile.duration);
+                mProgressSb.setMax(mCurrentMediaFile.duration);
                 updateProgress();
+            }
+        });
+        mVideoView.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            @Override
+            public void onCompletion(MediaPlayer mp) {
+                mPlayIv.setImageResource(R.drawable.selector_btn_play);
+
+                mHandler.removeMessages(WHAT_UPDATE_PROGRESS);
+
+                mProgressSb.setProgress(mVideoView.getDuration());
+                mCurrentTimeTv.setText(StringUtil.formatTime(mVideoView.getDuration()));
+
+                playVideo(mCurrentMediaFilePosition + 1);
             }
         });
         mVolumnIv.setOnClickListener(this);
@@ -132,7 +150,14 @@ public class VideoActivity extends BaseActivity {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 if (fromUser) {
+                    mHandler.removeMessages(WHAT_UPDATE_PROGRESS);
                     mVideoView.seekTo(progress);
+                    updateProgress();
+
+                    if (!mVideoView.isPlaying()) {
+                        mVideoView.start();
+                        updatePlayIvImageResource();
+                    }
                 }
             }
 
@@ -150,16 +175,29 @@ public class VideoActivity extends BaseActivity {
     protected void processLogic(Bundle savedInstanceState) {
         registerBatteryBroadcastReceiver();
 
-        mMediaFile = getIntent().getParcelableExtra(EXTRA_MEDIA_FILE);
-        mVideoView.setVideoURI(Uri.parse(mMediaFile.path));
-        mNameTv.setText(mMediaFile.name);
+        mMediaFiles = getIntent().getParcelableArrayListExtra(EXTRA_MEDIA_FILES);
 
-
-        mTotalTimeTv.setText(StringUtil.formatTime(mMediaFile.duration));
+        playVideo(getIntent().getIntExtra(EXTRA_CURRENT_MEDIA_FILE_POSITION, 0));
 
         updateSystime();
 
         initVolumn();
+    }
+
+    private void playVideo(int position) {
+        if (mMediaFiles != null && mMediaFiles.size() > 0 && position >= 0 && position < mMediaFiles.size() - 1) {
+            mCurrentMediaFilePosition = position;
+            mCurrentMediaFile = mMediaFiles.get(mCurrentMediaFilePosition);
+
+            mVideoView.setVideoURI(Uri.parse(mCurrentMediaFile.path));
+            mNameTv.setText(mCurrentMediaFile.name);
+
+            mTotalTimeTv.setText(StringUtil.formatTime(mCurrentMediaFile.duration));
+
+            mPreIv.setEnabled(mCurrentMediaFilePosition != 0);
+            mNextIv.setEnabled(mCurrentMediaFilePosition != mMediaFiles.size() - 1);
+        }
+
     }
 
     private void initVolumn() {
@@ -197,7 +235,7 @@ public class VideoActivity extends BaseActivity {
                 backward();
                 break;
             case R.id.iv_video_pre:
-
+                playVideo(mCurrentMediaFilePosition - 1);
                 break;
             case R.id.iv_video_play:
                 if (mVideoView.isPlaying()) {
@@ -210,7 +248,7 @@ public class VideoActivity extends BaseActivity {
                 updatePlayIvImageResource();
                 break;
             case R.id.iv_video_next:
-
+                playVideo(mCurrentMediaFilePosition + 1);
                 break;
             case R.id.iv_video_screen:
 
