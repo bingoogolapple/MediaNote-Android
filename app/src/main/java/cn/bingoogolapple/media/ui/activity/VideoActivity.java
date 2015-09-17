@@ -18,7 +18,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
-import android.widget.VideoView;
 
 import com.daimajia.androidanimations.library.Techniques;
 import com.daimajia.androidanimations.library.YoYo;
@@ -27,6 +26,7 @@ import java.util.List;
 
 import cn.bingoogolapple.media.R;
 import cn.bingoogolapple.media.model.MediaFile;
+import cn.bingoogolapple.media.ui.widget.VideoView;
 import cn.bingoogolapple.media.util.Logger;
 import cn.bingoogolapple.media.util.StringUtil;
 import cn.bingoogolapple.media.util.UIUtil;
@@ -221,6 +221,17 @@ public class VideoActivity extends BaseActivity {
                 }
                 return super.onSingleTapUp(e);
             }
+
+            @Override
+            public void onLongPress(MotionEvent e) {
+                onClick(mPlayIv);
+            }
+
+            @Override
+            public boolean onDoubleTap(MotionEvent e) {
+                onClick(mScreenIv);
+                return super.onDoubleTap(e);
+            }
         });
     }
 
@@ -235,6 +246,8 @@ public class VideoActivity extends BaseActivity {
         updateSystime();
 
         initVolumn();
+
+        updatePlayIvImageResource();
     }
 
     private void playHiddenControlAnim() {
@@ -318,8 +331,17 @@ public class VideoActivity extends BaseActivity {
                 playVideo(mCurrentMediaFilePosition + 1);
                 break;
             case R.id.iv_video_screen:
-
+                mVideoView.switchScreen();
+                updateScreenIvImageResource();
                 break;
+        }
+    }
+
+    private void updateScreenIvImageResource() {
+        if (mVideoView.isFullScreen()) {
+            mScreenIv.setImageResource(R.drawable.selector_btn_fullscreen);
+        } else {
+            mScreenIv.setImageResource(R.drawable.selector_btn_defaultscreen);
         }
     }
 

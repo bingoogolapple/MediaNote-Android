@@ -3,7 +3,7 @@
     style="@style/MatchMatch.Vertical"
     android:background="@android:color/black">
 
-    <VideoView
+    <cn.bingoogolapple.media.ui.widget.VideoView
         android:id="@+id/videoView"
         style="@style/MatchMatch"
         android:layout_centerInParent="true" />
@@ -130,7 +130,7 @@
                 android:id="@+id/iv_video_screen"
                 style="@style/AutoWrap"
                 android:clickable="true"
-                android:src="@drawable/selector_btn_fullscreen" />
+                android:src="@drawable/selector_btn_defaultscreen" />
         </LinearLayout>
     </LinearLayout>
 
