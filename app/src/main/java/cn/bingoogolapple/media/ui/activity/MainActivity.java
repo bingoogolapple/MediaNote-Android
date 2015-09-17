@@ -42,7 +42,11 @@ public class MainActivity extends BaseActivity {
     public void onClick(View v) {
         if (v.getId() == R.id.btn_main_testNetVideo) {
             Intent intent = new Intent(Intent.ACTION_VIEW);
-            intent.setDataAndType(Uri.parse("http://7xk9dj.com1.z0.glb.clouddn.com/medianote/oppo.mp4"), "video/*");
+//            intent.setDataAndType(Uri.parse("http://7xk9dj.com1.z0.glb.clouddn.com/medianote/oppo.mp4"), "video/*");
+            intent.setDataAndType(Uri.parse("http://7xk9dj.com1.z0.glb.clouddn.com/medianote/rmvb.rmvb"), "video/*");
+//            intent.setDataAndType(Uri.parse("http://7xk9dj.com1.z0.glb.clouddn.com/medianote/网络视频.mp4"), "video/*");
+//            intent.setDataAndType(Uri.parse("http://7xk9dj.com1.z0.glb.clouddn.com/medianote/测试3gp格式.3gp"), "video/*");
+//            intent.setDataAndType(Uri.parse("http://7xk9dj.com1.z0.glb.clouddn.com/medianote/测试非法视频.avi"), "video/*");
             startActivity(intent);
         }
     }

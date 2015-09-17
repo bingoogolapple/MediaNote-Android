@@ -19,13 +19,15 @@ import cn.bingoogolapple.media.model.MediaFile;
  */
 public class MediaScanner {
     private static String AUDIO_PATH = MediaStore.Audio.AudioColumns.DATA;
-    private static String AUDIO_TITLE = MediaStore.Audio.AudioColumns.TITLE;
+    //    private static String AUDIO_TITLE = MediaStore.Audio.AudioColumns.TITLE;
+    private static String AUDIO_TITLE = MediaStore.Audio.AudioColumns.DISPLAY_NAME;
     private static String AUDIO_SIZE = MediaStore.Audio.AudioColumns.SIZE;
     private static String AUDIO_DURATION = MediaStore.Audio.AudioColumns.DURATION;
     private static String AUDIO_PROJECTION[] = {AUDIO_PATH, AUDIO_TITLE, AUDIO_SIZE, AUDIO_DURATION};
 
     private static String VIDEO_PATH = MediaStore.Video.VideoColumns.DATA;
-    private static String VIDEO_TITLE = MediaStore.Video.VideoColumns.TITLE;
+    //    private static String VIDEO_TITLE = MediaStore.Video.VideoColumns.TITLE;
+    private static String VIDEO_TITLE = MediaStore.Video.VideoColumns.DISPLAY_NAME;
     private static String VIDEO_SIZE = MediaStore.Video.VideoColumns.SIZE;
     private static String VIDEO_DURATION = MediaStore.Video.VideoColumns.DURATION;
     private static String VIDEO_PROJECTION[] = {VIDEO_PATH, VIDEO_TITLE, VIDEO_SIZE, VIDEO_DURATION};

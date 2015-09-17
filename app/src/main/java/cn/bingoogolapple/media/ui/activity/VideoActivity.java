@@ -23,13 +23,14 @@ import android.widget.TextView;
 import com.daimajia.androidanimations.library.Techniques;
 import com.daimajia.androidanimations.library.YoYo;
 
-import java.util.List;
+import java.util.ArrayList;
 
 import cn.bingoogolapple.media.R;
 import cn.bingoogolapple.media.model.MediaFile;
 import cn.bingoogolapple.media.ui.widget.VideoView;
 import cn.bingoogolapple.media.util.Logger;
 import cn.bingoogolapple.media.util.StringUtil;
+import cn.bingoogolapple.media.util.ToastUtil;
 import cn.bingoogolapple.media.util.UIUtil;
 
 /**
@@ -44,7 +45,7 @@ public class VideoActivity extends BaseActivity {
     private static final int WHAT_UPDATE_PROGRESS = 1;
     private static final int WHAT_HIDDEN_CONTROL = 2;
     private VideoView mVideoView;
-    private List<MediaFile> mMediaFiles;
+    private ArrayList<MediaFile> mMediaFiles;
     private MediaFile mCurrentMediaFile;
     private int mCurrentMediaFilePosition;
     private TextView mNameTv;
@@ -80,6 +81,8 @@ public class VideoActivity extends BaseActivity {
     private GestureDetector mGestureDetector;
 
     private boolean mIsShowControl = false;
+
+    private Uri mUri;
 
     private Handler mHandler = new Handler() {
         @Override
@@ -264,6 +267,24 @@ public class VideoActivity extends BaseActivity {
                 return false;
             }
         });
+        mVideoView.setOnErrorListener(new MediaPlayer.OnErrorListener() {
+            @Override
+            public boolean onError(MediaPlayer mp, int what, int extra) {
+                if (what == MediaPlayer.MEDIA_ERROR_UNKNOWN) {
+                    ToastUtil.show("播放出错");
+                    Intent intent = new Intent(VideoActivity.this, VitamioActivity.class);
+                    if (mUri != null) {
+                        intent.setData(mUri);
+                    } else {
+                        intent.putExtra(VideoActivity.EXTRA_CURRENT_MEDIA_FILE_POSITION, mCurrentMediaFile);
+                        intent.putParcelableArrayListExtra(VideoActivity.EXTRA_MEDIA_FILES, mMediaFiles);
+                    }
+                    forwardAndFinish(intent);
+                }
+                // 返回true自己处理
+                return true;
+            }
+        });
     }
 
     @Override
@@ -272,9 +293,13 @@ public class VideoActivity extends BaseActivity {
 
         mMediaFiles = getIntent().getParcelableArrayListExtra(EXTRA_MEDIA_FILES);
 
-        Uri uri = getIntent().getData();
-        if (uri != null) {
-            playOtherVideo(uri);
+        mUri = getIntent().getData();
+
+        // 测试Vitamio
+        testVitamio();
+
+        if (mUri != null) {
+            playOtherVideo();
         } else {
             playOwnVideo(getIntent().getIntExtra(EXTRA_CURRENT_MEDIA_FILE_POSITION, 0));
         }
@@ -284,6 +309,17 @@ public class VideoActivity extends BaseActivity {
         initVolumn();
 
         updatePlayIvImageResource();
+    }
+
+    private void testVitamio() {
+        Intent intent = new Intent(VideoActivity.this, VitamioActivity.class);
+        if (mUri != null) {
+            intent.setData(mUri);
+        } else {
+            intent.putExtra(VideoActivity.EXTRA_CURRENT_MEDIA_FILE_POSITION, getIntent().getIntExtra(EXTRA_CURRENT_MEDIA_FILE_POSITION, 0));
+            intent.putParcelableArrayListExtra(VideoActivity.EXTRA_MEDIA_FILES, mMediaFiles);
+        }
+        forwardAndFinish(intent);
     }
 
     private void playHiddenControlAnim() {
@@ -300,9 +336,9 @@ public class VideoActivity extends BaseActivity {
         mHandler.sendEmptyMessageDelayed(WHAT_HIDDEN_CONTROL, 3000);
     }
 
-    private void playOtherVideo(Uri uri) {
-        mVideoView.setVideoURI(uri);
-        mNameTv.setText(uri.toString());
+    private void playOtherVideo() {
+        mVideoView.setVideoURI(mUri);
+        mNameTv.setText(mUri.toString());
 
         mPreIv.setEnabled(false);
         mNextIv.setEnabled(false);

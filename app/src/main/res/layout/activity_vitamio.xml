@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    style="@style/MatchMatch.Vertical"
+    android:background="@android:color/black">
+
+    <io.vov.vitamio.widget.VideoView
+        android:id="@+id/videoView"
+        style="@style/MatchMatch"
+        android:layout_centerInParent="true" />
+
+    <LinearLayout
+        android:id="@+id/ll_video_topContainer"
+        style="@style/MatchWrap.Vertical">
+
+        <LinearLayout
+            style="@style/MatchWrap.Horizontal"
+            android:background="@mipmap/bg_player_status"
+            android:gravity="center_vertical"
+            android:padding="@dimen/size_level1">
+
+            <TextView
+                android:id="@+id/tv_video_name"
+                style="@style/AutoWrap"
+                android:text="视频名称"
+                android:textColor="@color/white"
+                android:textSize="@dimen/textSize_12" />
+
+            <ImageView
+                android:id="@+id/iv_video_battery"
+                style="@style/WrapWrap"
+                android:layout_marginRight="@dimen/size_level1"
+                android:src="@mipmap/ic_battery_10" />
+
+            <TextView
+                android:id="@+id/tv_video_systime"
+                style="@style/WrapWrap"
+                android:text="12:30"
+                android:textColor="@color/white"
+                android:textSize="@dimen/textSize_14" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            style="@style/MatchWrap.Horizontal"
+            android:background="@mipmap/bg_player_top_control"
+            android:gravity="center_vertical"
+            android:padding="@dimen/size_level1">
+
+            <ImageView
+                android:id="@+id/iv_video_voice"
+                style="@style/WrapWrap"
+                android:clickable="true"
+                android:src="@drawable/selector_voice" />
+
+            <SeekBar
+                android:id="@+id/sb_video_volumn"
+                style="@style/MatchWrap"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="@dimen/size_level2"
+                android:progressDrawable="@drawable/layer_progress"
+                android:thumb="@mipmap/progress_thumb" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/ll_video_bottomContainer"
+        style="@style/MatchWrap.Vertical"
+        android:layout_alignParentBottom="true">
+
+        <LinearLayout
+            style="@style/MatchWrap.Horizontal"
+            android:background="@mipmap/bg_player_bottom_seekbar"
+            android:gravity="center_vertical"
+            android:padding="@dimen/size_level1">
+
+            <TextView
+                android:id="@+id/tv_video_currentTime"
+                style="@style/WrapWrap"
+                android:text="00:00"
+                android:textColor="@color/white"
+                android:textSize="@dimen/textSize_12" />
+
+            <SeekBar
+                android:id="@+id/sb_video_progress"
+                style="@style/AutoWrap"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/size_level1"
+                android:layout_marginRight="@dimen/size_level1"
+                android:progressDrawable="@drawable/layer_progress"
+                android:thumb="@mipmap/progress_thumb" />
+
+            <TextView
+                android:id="@+id/tv_video_totleTime"
+                style="@style/WrapWrap"
+                android:text="00:00"
+                android:textColor="@color/white"
+                android:textSize="@dimen/textSize_12" />
+        </LinearLayout>
+
+        <LinearLayout
+            style="@style/MatchWrap.Horizontal"
+            android:background="@mipmap/bg_player_bottom_control"
+            android:gravity="center_vertical">
+
+            <ImageView
+                android:id="@+id/iv_video_exit"
+                style="@style/AutoWrap"
+                android:clickable="true"
+                android:src="@drawable/selector_btn_exit" />
+
+            <ImageView
+                android:id="@+id/iv_video_pre"
+                style="@style/AutoWrap"
+                android:clickable="true"
+                android:src="@drawable/selector_btn_pre" />
+
+            <ImageView
+                android:id="@+id/iv_video_play"
+                style="@style/AutoWrap"
+                android:clickable="true"
+                android:src="@drawable/selector_btn_pause" />
+
+            <ImageView
+                android:id="@+id/iv_video_next"
+                style="@style/AutoWrap"
+                android:clickable="true"
+                android:src="@drawable/selector_btn_next" />
+
+            <ImageView
+                android:id="@+id/iv_video_screen"
+                style="@style/AutoWrap"
+                android:clickable="true"
+                android:src="@drawable/selector_btn_defaultscreen" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/ll_video_loading"
+        style="@style/MatchMatch.Horizontal"
+        android:background="@mipmap/bg_player_loading_background"
+        android:gravity="center">
+
+        <ProgressBar
+            android:layout_width="@dimen/size_level5"
+            android:layout_height="@dimen/size_level5" />
+
+        <TextView
+            style="@style/WrapWrap"
+            android:layout_marginLeft="@dimen/size_level2"
+            android:text="@string/loading"
+            android:textColor="@color/white"
+            android:textSize="@dimen/textSize_18" />
+    </LinearLayout>
+
+    <ProgressBar
+        android:id="@+id/pb_video_loading"
+        android:layout_width="@dimen/size_level5"
+        android:layout_height="@dimen/size_level5"
+        android:layout_centerInParent="true"
+        android:visibility="gone" />
+
+</RelativeLayout>
