@@ -10,12 +10,18 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewTreeObserver;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.VideoView;
+
+import com.daimajia.androidanimations.library.Techniques;
+import com.daimajia.androidanimations.library.YoYo;
 
 import java.util.List;
 
@@ -35,6 +41,7 @@ public class VideoActivity extends BaseActivity {
     public static final String EXTRA_CURRENT_MEDIA_FILE_POSITION = "EXTRA_CURRENT_MEDIA_FILE_POSITION";
     private static final int WHAT_UPDATE_SYSTIME = 0;
     private static final int WHAT_UPDATE_PROGRESS = 1;
+    private static final int WHAT_HIDDEN_CONTROL = 2;
     private VideoView mVideoView;
     private List<MediaFile> mMediaFiles;
     private MediaFile mCurrentMediaFile;
@@ -57,11 +64,18 @@ public class VideoActivity extends BaseActivity {
     private TextView mCurrentTimeTv;
     private TextView mTotalTimeTv;
 
+    private LinearLayout mTopContainerLl;
+    private LinearLayout mBottomContainerLl;
+
     private AudioManager mAudioManager;
 
     private BatteryBroadcastReceiver mBatteryBroadcastReceiver;
 
     private float mDownY;
+
+    private GestureDetector mGestureDetector;
+
+    private boolean mIsShowControl = false;
 
     private Handler mHandler = new Handler() {
         @Override
@@ -72,6 +86,9 @@ public class VideoActivity extends BaseActivity {
                     break;
                 case WHAT_UPDATE_SYSTIME:
                     updateSystime();
+                    break;
+                case WHAT_HIDDEN_CONTROL:
+                    playHiddenControlAnim();
                     break;
             }
         }
@@ -95,6 +112,9 @@ public class VideoActivity extends BaseActivity {
         mProgressSb = getViewById(R.id.sb_video_progress);
         mTotalTimeTv = getViewById(R.id.tv_video_totleTime);
         mCurrentTimeTv = getViewById(R.id.tv_video_currentTime);
+
+        mTopContainerLl = getViewById(R.id.ll_video_topContainer);
+        mBottomContainerLl = getViewById(R.id.ll_video_bottomContainer);
     }
 
     @Override
@@ -131,6 +151,7 @@ public class VideoActivity extends BaseActivity {
         mVolumnSb.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
+                mHandler.removeMessages(WHAT_HIDDEN_CONTROL);
             }
 
             @Override
@@ -144,9 +165,15 @@ public class VideoActivity extends BaseActivity {
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
+                mHandler.sendEmptyMessageDelayed(WHAT_HIDDEN_CONTROL, 3000);
             }
         });
         mProgressSb.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+                mHandler.removeMessages(WHAT_HIDDEN_CONTROL);
+            }
+
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 if (fromUser) {
@@ -162,11 +189,37 @@ public class VideoActivity extends BaseActivity {
             }
 
             @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-            }
-
-            @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
+                mHandler.sendEmptyMessageDelayed(WHAT_HIDDEN_CONTROL, 3000);
+            }
+        });
+
+        mTopContainerLl.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                mTopContainerLl.getViewTreeObserver().removeGlobalOnLayoutListener(this);
+//                ViewPropertyAnimator.animate(mTopContainerLl).translationY(-1 * mTopContainerLl.getHeight()).setDuration(700);
+//                ViewPropertyAnimator.animate(mTopContainerLl).alpha(0.0f).setDuration(700);
+                YoYo.with(Techniques.FadeOutUp).duration(700).playOn(mTopContainerLl);
+            }
+        });
+        mBottomContainerLl.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                mBottomContainerLl.getViewTreeObserver().removeGlobalOnLayoutListener(this);
+                YoYo.with(Techniques.FadeOutDown).duration(700).playOn(mBottomContainerLl);
+            }
+        });
+
+        mGestureDetector = new GestureDetector(mApp, new GestureDetector.SimpleOnGestureListener() {
+            @Override
+            public boolean onSingleTapUp(MotionEvent e) {
+                if (mIsShowControl) {
+                    playHiddenControlAnim();
+                } else {
+                    playShowControlAnim();
+                }
+                return super.onSingleTapUp(e);
             }
         });
     }
@@ -182,6 +235,20 @@ public class VideoActivity extends BaseActivity {
         updateSystime();
 
         initVolumn();
+    }
+
+    private void playHiddenControlAnim() {
+        YoYo.with(Techniques.FadeOutUp).duration(700).playOn(mTopContainerLl);
+        YoYo.with(Techniques.FadeOutDown).duration(700).playOn(mBottomContainerLl);
+        mIsShowControl = false;
+        mHandler.removeMessages(WHAT_HIDDEN_CONTROL);
+    }
+
+    private void playShowControlAnim() {
+        YoYo.with(Techniques.FadeInDown).duration(700).playOn(mTopContainerLl);
+        YoYo.with(Techniques.FadeInUp).duration(700).playOn(mBottomContainerLl);
+        mIsShowControl = true;
+        mHandler.sendEmptyMessageDelayed(WHAT_HIDDEN_CONTROL, 3000);
     }
 
     private void playVideo(int position) {
@@ -280,8 +347,8 @@ public class VideoActivity extends BaseActivity {
 
     private void updateProgress() {
         mProgressSb.setProgress(mVideoView.getCurrentPosition());
-        mHandler.sendEmptyMessageDelayed(WHAT_UPDATE_PROGRESS, 1000);
         mCurrentTimeTv.setText(StringUtil.formatTime(mVideoView.getCurrentPosition()));
+        mHandler.sendEmptyMessageDelayed(WHAT_UPDATE_PROGRESS, 1000);
         Logger.i(TAG, "修改进度");
     }
 
@@ -321,6 +388,8 @@ public class VideoActivity extends BaseActivity {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
+        mGestureDetector.onTouchEvent(event);
+
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
                 mDownY = event.getY();
