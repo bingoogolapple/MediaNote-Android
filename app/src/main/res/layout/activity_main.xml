@@ -20,4 +20,12 @@
         android:id="@+id/vp_main_content"
         style="@style/MatchAuto" />
 
+    <Button
+        android:id="@+id/btn_main_testNetVideo"
+        style="@style/MatchWrap"
+        android:background="@color/orange_normal"
+        android:text="测试播放网络视频"
+        android:textColor="@color/white"
+        android:textSize="@dimen/textSize_16" />
+
 </LinearLayout>

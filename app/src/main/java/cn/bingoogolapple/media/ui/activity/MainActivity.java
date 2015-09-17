@@ -1,10 +1,13 @@
 package cn.bingoogolapple.media.ui.activity;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.view.View;
 
 import cn.bingoogolapple.bgaindicator.BGAFixedIndicator;
 import cn.bingoogolapple.media.R;
@@ -26,12 +29,22 @@ public class MainActivity extends BaseActivity {
 
     @Override
     protected void setListener() {
+        getViewById(R.id.btn_main_testNetVideo).setOnClickListener(this);
     }
 
     @Override
     protected void processLogic(Bundle savedInstanceState) {
         mContentVp.setAdapter(new ContentAdapter(getSupportFragmentManager()));
         mIndicator.initData(0, mContentVp);
+    }
+
+    @Override
+    public void onClick(View v) {
+        if (v.getId() == R.id.btn_main_testNetVideo) {
+            Intent intent = new Intent(Intent.ACTION_VIEW);
+            intent.setDataAndType(Uri.parse("http://7xk9dj.com1.z0.glb.clouddn.com/medianote/oppo.mp4"), "video/*");
+            startActivity(intent);
+        }
     }
 
     private class ContentAdapter extends FragmentPagerAdapter {
