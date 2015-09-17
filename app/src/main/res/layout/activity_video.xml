@@ -134,4 +134,29 @@
         </LinearLayout>
     </LinearLayout>
 
+    <LinearLayout
+        android:id="@+id/ll_video_loading"
+        style="@style/MatchMatch.Horizontal"
+        android:background="@mipmap/bg_player_loading_background"
+        android:gravity="center">
+
+        <ProgressBar
+            android:layout_width="@dimen/size_level5"
+            android:layout_height="@dimen/size_level5" />
+
+        <TextView
+            style="@style/WrapWrap"
+            android:layout_marginLeft="@dimen/size_level2"
+            android:text="@string/loading"
+            android:textColor="@color/white"
+            android:textSize="@dimen/textSize_18" />
+    </LinearLayout>
+
+    <ProgressBar
+        android:id="@+id/pb_video_loading"
+        android:layout_width="@dimen/size_level5"
+        android:layout_height="@dimen/size_level5"
+        android:layout_centerInParent="true"
+        android:visibility="gone" />
+
 </RelativeLayout>

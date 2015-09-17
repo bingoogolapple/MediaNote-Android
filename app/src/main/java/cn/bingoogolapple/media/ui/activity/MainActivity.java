@@ -11,8 +11,8 @@ import android.view.View;
 
 import cn.bingoogolapple.bgaindicator.BGAFixedIndicator;
 import cn.bingoogolapple.media.R;
-import cn.bingoogolapple.media.ui.fragment.VideoFragment;
 import cn.bingoogolapple.media.ui.fragment.AudioFragment;
+import cn.bingoogolapple.media.ui.fragment.VideoFragment;
 
 public class MainActivity extends BaseActivity {
     private BGAFixedIndicator mIndicator;

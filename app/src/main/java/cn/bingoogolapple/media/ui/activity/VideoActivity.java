@@ -16,6 +16,7 @@ import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
@@ -67,6 +68,9 @@ public class VideoActivity extends BaseActivity {
     private LinearLayout mTopContainerLl;
     private LinearLayout mBottomContainerLl;
 
+    private LinearLayout mLoadingLl;
+    private ProgressBar mLoadingPb;
+
     private AudioManager mAudioManager;
 
     private BatteryBroadcastReceiver mBatteryBroadcastReceiver;
@@ -115,6 +119,8 @@ public class VideoActivity extends BaseActivity {
 
         mTopContainerLl = getViewById(R.id.ll_video_topContainer);
         mBottomContainerLl = getViewById(R.id.ll_video_bottomContainer);
+        mLoadingLl = getViewById(R.id.ll_video_loading);
+        mLoadingPb = getViewById(R.id.pb_video_loading);
     }
 
     @Override
@@ -122,6 +128,8 @@ public class VideoActivity extends BaseActivity {
         mVideoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
             @Override
             public void onPrepared(MediaPlayer mp) {
+                YoYo.with(Techniques.FadeOut).duration(700).playOn(mLoadingLl);
+
                 mVideoView.start();
                 updatePlayIvImageResource();
 
@@ -233,6 +241,27 @@ public class VideoActivity extends BaseActivity {
             public boolean onDoubleTap(MotionEvent e) {
                 onClick(mScreenIv);
                 return super.onDoubleTap(e);
+            }
+        });
+
+        mVideoView.setOnBufferingUpdateListener(new MediaPlayer.OnBufferingUpdateListener() {
+            @Override
+            public void onBufferingUpdate(MediaPlayer mp, int percent) {
+                int secondaryProgress = (int) ((1.0f * percent / 100) * mVideoView.getDuration());
+                mProgressSb.setSecondaryProgress(secondaryProgress);
+            }
+        });
+        mVideoView.setOnInfoListener(new MediaPlayer.OnInfoListener() {
+            @Override
+            public boolean onInfo(MediaPlayer mp, int what, int extra) {
+                if (what == MediaPlayer.MEDIA_INFO_BUFFERING_START) {
+                    // 开始卡顿
+                    mLoadingPb.setVisibility(View.VISIBLE);
+                } else if (what == MediaPlayer.MEDIA_INFO_BUFFERING_END) {
+                    // 卡顿结束
+                    mLoadingPb.setVisibility(View.GONE);
+                }
+                return false;
             }
         });
     }
