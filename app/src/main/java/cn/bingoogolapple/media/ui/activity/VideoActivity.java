@@ -125,7 +125,9 @@ public class VideoActivity extends BaseActivity {
                 mVideoView.start();
                 updatePlayIvImageResource();
 
-                mProgressSb.setMax(mCurrentMediaFile.duration);
+                mProgressSb.setMax(mVideoView.getDuration());
+
+                mTotalTimeTv.setText(StringUtil.formatTime(mVideoView.getDuration()));
                 updateProgress();
             }
         });
@@ -139,7 +141,7 @@ public class VideoActivity extends BaseActivity {
                 mProgressSb.setProgress(mVideoView.getDuration());
                 mCurrentTimeTv.setText(StringUtil.formatTime(mVideoView.getDuration()));
 
-                playVideo(mCurrentMediaFilePosition + 1);
+                playOwnVideo(mCurrentMediaFilePosition + 1);
             }
         });
         mVolumnIv.setOnClickListener(this);
@@ -241,7 +243,12 @@ public class VideoActivity extends BaseActivity {
 
         mMediaFiles = getIntent().getParcelableArrayListExtra(EXTRA_MEDIA_FILES);
 
-        playVideo(getIntent().getIntExtra(EXTRA_CURRENT_MEDIA_FILE_POSITION, 0));
+        Uri uri = getIntent().getData();
+        if (uri != null) {
+            playOtherVideo(uri);
+        } else {
+            playOwnVideo(getIntent().getIntExtra(EXTRA_CURRENT_MEDIA_FILE_POSITION, 0));
+        }
 
         updateSystime();
 
@@ -264,7 +271,15 @@ public class VideoActivity extends BaseActivity {
         mHandler.sendEmptyMessageDelayed(WHAT_HIDDEN_CONTROL, 3000);
     }
 
-    private void playVideo(int position) {
+    private void playOtherVideo(Uri uri) {
+        mVideoView.setVideoURI(uri);
+        mNameTv.setText(uri.toString());
+
+        mPreIv.setEnabled(false);
+        mNextIv.setEnabled(false);
+    }
+
+    private void playOwnVideo(int position) {
         if (mMediaFiles != null && mMediaFiles.size() > 0 && position >= 0 && position < mMediaFiles.size() - 1) {
             mCurrentMediaFilePosition = position;
             mCurrentMediaFile = mMediaFiles.get(mCurrentMediaFilePosition);
@@ -272,12 +287,9 @@ public class VideoActivity extends BaseActivity {
             mVideoView.setVideoURI(Uri.parse(mCurrentMediaFile.path));
             mNameTv.setText(mCurrentMediaFile.name);
 
-            mTotalTimeTv.setText(StringUtil.formatTime(mCurrentMediaFile.duration));
-
             mPreIv.setEnabled(mCurrentMediaFilePosition != 0);
             mNextIv.setEnabled(mCurrentMediaFilePosition != mMediaFiles.size() - 1);
         }
-
     }
 
     private void initVolumn() {
@@ -315,7 +327,7 @@ public class VideoActivity extends BaseActivity {
                 backward();
                 break;
             case R.id.iv_video_pre:
-                playVideo(mCurrentMediaFilePosition - 1);
+                playOwnVideo(mCurrentMediaFilePosition - 1);
                 break;
             case R.id.iv_video_play:
                 if (mVideoView.isPlaying()) {
@@ -328,7 +340,7 @@ public class VideoActivity extends BaseActivity {
                 updatePlayIvImageResource();
                 break;
             case R.id.iv_video_next:
-                playVideo(mCurrentMediaFilePosition + 1);
+                playOwnVideo(mCurrentMediaFilePosition + 1);
                 break;
             case R.id.iv_video_screen:
                 mVideoView.switchScreen();
