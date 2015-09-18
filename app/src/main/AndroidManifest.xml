@@ -37,6 +37,7 @@
 
         <activity
             android:name=".ui.activity.VideoActivity"
+            android:configChanges="orientation|screenSize|smallestScreenSize|keyboard|keyboardHidden|navigation"
             android:screenOrientation="landscape"
             android:theme="@style/AppThemeFullscreen"
             android:windowSoftInputMode="stateAlwaysHidden">
@@ -64,6 +65,7 @@
 
         <activity
             android:name=".ui.activity.VitamioActivity"
+            android:configChanges="orientation|screenSize|smallestScreenSize|keyboard|keyboardHidden|navigation"
             android:screenOrientation="landscape"
             android:theme="@style/AppThemeFullscreen"
             android:windowSoftInputMode="stateAlwaysHidden" />
@@ -73,7 +75,12 @@
             android:configChanges="orientation|screenSize|smallestScreenSize|keyboard|keyboardHidden|navigation"
             android:launchMode="singleTop"
             android:theme="@android:style/Theme.NoTitleBar"
-            android:windowSoftInputMode="stateAlwaysHidden"/>
+            android:windowSoftInputMode="stateAlwaysHidden" />
+
+        <activity
+            android:name=".ui.activity.AudioActivity"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateAlwaysHidden" />
     </application>
 
 </manifest>

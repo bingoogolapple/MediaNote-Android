@@ -1,9 +1,11 @@
 package cn.bingoogolapple.media.ui.fragment;
 
+import android.content.Intent;
 import android.database.ContentObserver;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Parcelable;
 import android.provider.MediaStore;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -11,6 +13,7 @@ import android.text.format.Formatter;
 import android.view.View;
 import android.view.ViewGroup;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import cn.bingoogolapple.androidcommon.adapter.BGAOnRVItemClickListener;
@@ -19,9 +22,10 @@ import cn.bingoogolapple.androidcommon.adapter.BGAViewHolderHelper;
 import cn.bingoogolapple.media.R;
 import cn.bingoogolapple.media.engine.MediaScanner;
 import cn.bingoogolapple.media.model.MediaFile;
+import cn.bingoogolapple.media.ui.activity.AudioActivity;
 import cn.bingoogolapple.media.ui.widget.Divider;
-import cn.bingoogolapple.media.util.ThreadUtil;
 import cn.bingoogolapple.media.util.StringUtil;
+import cn.bingoogolapple.media.util.ThreadUtil;
 
 /**
  * 作者:王浩 邮件:bingoogolapple@gmail.com
@@ -30,7 +34,7 @@ import cn.bingoogolapple.media.util.StringUtil;
  */
 public class AudioFragment extends BaseFragment implements BGAOnRVItemClickListener {
     private RecyclerView mDataRv;
-    private MusicAdapter mMusicAdapter;
+    private MusicAdapter mAudioAdapter;
     private AudioContentObserver mAudioContentObserver;
 
     @Override
@@ -41,8 +45,8 @@ public class AudioFragment extends BaseFragment implements BGAOnRVItemClickListe
 
     @Override
     protected void setListener() {
-        mMusicAdapter = new MusicAdapter(mDataRv);
-        mMusicAdapter.setOnRVItemClickListener(this);
+        mAudioAdapter = new MusicAdapter(mDataRv);
+        mAudioAdapter.setOnRVItemClickListener(this);
     }
 
     @Override
@@ -52,7 +56,7 @@ public class AudioFragment extends BaseFragment implements BGAOnRVItemClickListe
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         mDataRv.setLayoutManager(layoutManager);
         mDataRv.addItemDecoration(new Divider(mActivity));
-        mDataRv.setAdapter(mMusicAdapter);
+        mDataRv.setAdapter(mAudioAdapter);
 
         reloadData();
     }
@@ -65,7 +69,7 @@ public class AudioFragment extends BaseFragment implements BGAOnRVItemClickListe
                 ThreadUtil.runInUIThread(new Runnable() {
                     @Override
                     public void run() {
-                        mMusicAdapter.setDatas(mediaFiles);
+                        mAudioAdapter.setDatas(mediaFiles);
                     }
                 });
             }
@@ -89,7 +93,10 @@ public class AudioFragment extends BaseFragment implements BGAOnRVItemClickListe
 
     @Override
     public void onRVItemClick(ViewGroup viewGroup, View view, int position) {
-
+        Intent intent = new Intent(mActivity, AudioActivity.class);
+        intent.putExtra(AudioActivity.EXTRA_CURRENT_MEDIA_FILE_POSITION, position);
+        intent.putParcelableArrayListExtra(AudioActivity.EXTRA_MEDIA_FILES, (ArrayList<? extends Parcelable>) mAudioAdapter.getDatas());
+        mActivity.forward(intent);
     }
 
     private final class MusicAdapter extends BGARecyclerViewAdapter<MediaFile> {

@@ -382,6 +382,11 @@ public class VideoActivity extends BaseActivity {
     }
 
     @Override
+    public void onBackPressed() {
+        backward();
+    }
+
+    @Override
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.iv_video_voice:
@@ -389,7 +394,7 @@ public class VideoActivity extends BaseActivity {
                 updateVolumn();
                 break;
             case R.id.iv_video_exit:
-                backward();
+                onBackPressed();
                 break;
             case R.id.iv_video_pre:
                 playOwnVideo(mCurrentMediaFilePosition - 1);

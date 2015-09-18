@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    style="@style/MatchMatch.Vertical"
+    android:background="@mipmap/base_bg">
+
+    <cn.bingoogolapple.titlebar.BGATitlebar
+        android:id="@+id/titlebar"
+        style="@style/TitleBar.Back"
+        android:background="@mipmap/base_titlebar_bg" />
+
+    <RelativeLayout style="@style/MatchWrap">
+
+        <ImageView
+            android:id="@+id/iv_audio_anim"
+            style="@style/WrapWrap"
+            android:layout_centerHorizontal="true"
+            android:src="@anim/audio_player_anim" />
+
+        <TextView
+            android:id="@+id/tv_audio_name"
+            style="@style/WrapWrap"
+            android:layout_alignBottom="@id/iv_audio_anim"
+            android:layout_centerHorizontal="true"
+            android:text="音频名称"
+            android:textColor="@color/white"
+            android:textSize="@dimen/textSize_18" />
+    </RelativeLayout>
+
+    <TextView
+        style="@style/MatchAuto"
+        android:gravity="center"
+        android:text="我是歌词"
+        android:textColor="@color/white"
+        android:textSize="@dimen/textSize_18" />
+
+    <TextView
+        android:id="@+id/tv_audio_time"
+        style="@style/MatchWrap"
+        android:gravity="right"
+        android:paddingRight="@dimen/size_level3"
+        android:text="2:33/3:50"
+        android:textColor="@color/white"
+        android:textSize="@dimen/textSize_14" />
+
+    <SeekBar
+        android:id="@+id/seekbar"
+        style="@style/MatchWrap"
+        android:layout_margin="@dimen/size_level3"
+        android:progressDrawable="@drawable/layer_audio_progress"
+        android:thumb="@mipmap/audio_seek_thumb"
+        android:thumbOffset="0dp" />
+
+
+    <LinearLayout
+        style="@style/MatchWrap.Horizontal"
+        android:layout_marginBottom="@dimen/size_level3"
+        android:gravity="center">
+
+        <ImageView
+            android:id="@+id/btn_paly_mode"
+            style="@style/AutoWrap"
+            android:src="@drawable/selector_audio_mode_normal" />
+
+        <ImageView
+            android:id="@+id/btn_pre"
+            style="@style/AutoWrap"
+            android:src="@drawable/selector_btn_audio_pre" />
+
+        <ImageView
+            android:id="@+id/btn_play"
+            style="@style/AutoWrap"
+            android:src="@drawable/selector_btn_audio_pause" />
+
+
+        <ImageView
+            android:id="@+id/btn_next"
+            style="@style/AutoWrap"
+            android:src="@drawable/selector_btn_audio_next" />
+
+        <ImageView
+            style="@style/AutoWrap"
+            android:src="@mipmap/btn_lyrics" />
+    </LinearLayout>
+</LinearLayout>

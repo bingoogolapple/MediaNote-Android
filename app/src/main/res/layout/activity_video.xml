@@ -57,8 +57,9 @@
                 style="@style/MatchWrap"
                 android:layout_height="wrap_content"
                 android:layout_marginRight="@dimen/size_level2"
-                android:progressDrawable="@drawable/layer_progress"
-                android:thumb="@mipmap/progress_thumb" />
+                android:progressDrawable="@drawable/layer_video_progress"
+                android:thumb="@mipmap/progress_thumb"
+                android:thumbOffset="0dp" />
         </LinearLayout>
     </LinearLayout>
 
@@ -86,8 +87,9 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="@dimen/size_level1"
                 android:layout_marginRight="@dimen/size_level1"
-                android:progressDrawable="@drawable/layer_progress"
-                android:thumb="@mipmap/progress_thumb" />
+                android:progressDrawable="@drawable/layer_video_progress"
+                android:thumb="@mipmap/progress_thumb"
+                android:thumbOffset="0dp" />
 
             <TextView
                 android:id="@+id/tv_video_totleTime"
