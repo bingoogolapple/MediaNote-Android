@@ -23,7 +23,8 @@ public class MediaScanner {
     private static String AUDIO_TITLE = MediaStore.Audio.AudioColumns.DISPLAY_NAME;
     private static String AUDIO_SIZE = MediaStore.Audio.AudioColumns.SIZE;
     private static String AUDIO_DURATION = MediaStore.Audio.AudioColumns.DURATION;
-    private static String AUDIO_PROJECTION[] = {AUDIO_PATH, AUDIO_TITLE, AUDIO_SIZE, AUDIO_DURATION};
+    private static String AUDIO_ARTIST = MediaStore.Audio.AudioColumns.ARTIST;
+    private static String AUDIO_PROJECTION[] = {AUDIO_PATH, AUDIO_TITLE, AUDIO_SIZE, AUDIO_DURATION, AUDIO_ARTIST};
 
     private static String VIDEO_PATH = MediaStore.Video.VideoColumns.DATA;
     //    private static String VIDEO_TITLE = MediaStore.Video.VideoColumns.TITLE;
@@ -54,14 +55,14 @@ public class MediaScanner {
     }
 
     public static List<MediaFile> scanAudio() {
-        return scanMedia(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, AUDIO_PROJECTION, AUDIO_TITLE, AUDIO_TITLE, AUDIO_PATH, AUDIO_SIZE, AUDIO_DURATION);
+        return scanMedia(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, AUDIO_PROJECTION, AUDIO_TITLE, AUDIO_TITLE, AUDIO_PATH, AUDIO_SIZE, AUDIO_DURATION, AUDIO_ARTIST);
     }
 
     public static List<MediaFile> scanVideo() {
-        return scanMedia(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, VIDEO_PROJECTION, VIDEO_TITLE, VIDEO_TITLE, VIDEO_PATH, VIDEO_SIZE, VIDEO_DURATION);
+        return scanMedia(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, VIDEO_PROJECTION, VIDEO_TITLE, VIDEO_TITLE, VIDEO_PATH, VIDEO_SIZE, VIDEO_DURATION, null);
     }
 
-    public static List<MediaFile> scanMedia(Uri uri, String[] projection, String sortOrder, String nameColumn, String pathColumn, String sizeColumn, String durationColumn) {
+    public static List<MediaFile> scanMedia(Uri uri, String[] projection, String sortOrder, String nameColumn, String pathColumn, String sizeColumn, String durationColumn, String artistColumn) {
         List<MediaFile> results = new ArrayList<>();
         Cursor cursor = App.getInstance().getContentResolver().query(uri, projection, null, null, sortOrder);
         if (cursor != null) {
@@ -73,6 +74,9 @@ public class MediaScanner {
                     mediaFile.path = cursor.getString(cursor.getColumnIndex(pathColumn));
                     mediaFile.duration = cursor.getInt(cursor.getColumnIndex(durationColumn));
                     mediaFile.size = cursor.getInt(cursor.getColumnIndex(sizeColumn));
+                    if (artistColumn != null) {
+                        mediaFile.artist = cursor.getString(cursor.getColumnIndex(artistColumn));
+                    }
                     results.add(mediaFile);
                 }
             }

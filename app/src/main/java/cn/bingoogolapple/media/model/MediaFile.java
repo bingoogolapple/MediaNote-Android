@@ -13,6 +13,7 @@ public class MediaFile implements Parcelable {
     public String path;
     public int size;
     public int duration;
+    public String artist;
 
     @Override
     public int describeContents() {
@@ -25,6 +26,7 @@ public class MediaFile implements Parcelable {
         dest.writeString(this.path);
         dest.writeInt(this.size);
         dest.writeInt(this.duration);
+        dest.writeString(this.artist);
     }
 
     public MediaFile() {
@@ -35,6 +37,7 @@ public class MediaFile implements Parcelable {
         this.path = in.readString();
         this.size = in.readInt();
         this.duration = in.readInt();
+        this.artist = in.readString();
     }
 
     public static final Parcelable.Creator<MediaFile> CREATOR = new Parcelable.Creator<MediaFile>() {

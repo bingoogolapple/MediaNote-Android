@@ -43,37 +43,35 @@
         android:textSize="@dimen/textSize_14" />
 
     <SeekBar
-        android:id="@+id/seekbar"
+        android:id="@+id/sb_audio_progress"
         style="@style/MatchWrap"
         android:layout_margin="@dimen/size_level3"
         android:progressDrawable="@drawable/layer_audio_progress"
         android:thumb="@mipmap/audio_seek_thumb"
         android:thumbOffset="0dp" />
 
-
     <LinearLayout
         style="@style/MatchWrap.Horizontal"
         android:layout_marginBottom="@dimen/size_level3"
-        android:gravity="center">
+        android:gravity="center_vertical">
 
         <ImageView
-            android:id="@+id/btn_paly_mode"
+            android:id="@+id/iv_audio_mode"
             style="@style/AutoWrap"
             android:src="@drawable/selector_audio_mode_normal" />
 
         <ImageView
-            android:id="@+id/btn_pre"
+            android:id="@+id/iv_audio_pre"
             style="@style/AutoWrap"
             android:src="@drawable/selector_btn_audio_pre" />
 
         <ImageView
-            android:id="@+id/btn_play"
+            android:id="@+id/iv_audio_play"
             style="@style/AutoWrap"
             android:src="@drawable/selector_btn_audio_pause" />
 
-
         <ImageView
-            android:id="@+id/btn_next"
+            android:id="@+id/iv_audio_next"
             style="@style/AutoWrap"
             android:src="@drawable/selector_btn_audio_next" />
 
