@@ -8,6 +8,7 @@ import android.os.IBinder;
 import android.support.annotation.Nullable;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 import cn.bingoogolapple.media.model.MediaFile;
 import cn.bingoogolapple.media.util.Logger;
@@ -19,12 +20,19 @@ import cn.bingoogolapple.media.util.Logger;
  */
 public class AudioService extends Service {
     private static final String TAG = AudioService.class.getSimpleName();
+    public static final String EXTRA_MEDIA_FILES = "EXTRA_MEDIA_FILES";
+    public static final String EXTRA_CURRENT_MEDIA_FILE_POSITION = "EXTRA_CURRENT_MEDIA_FILE_POSITION";
+    public static final String EXTRA_TOTAL_MEDIA_FILE = "EXTRA_TOTAL_MEDIA_FILE";
     public static final String EXTRA_MEDIA_FILE = "EXTRA_MEDIA_FILE";
+
     public static final String ACTION_AUDIO_PREPARED = "ACTION_AUDIO_PREPARED";
     public static final String ACTION_AUDIO_COMPLETION = "ACTION_AUDIO_COMPLETION";
+    public static final String ACTION_AUDIO_FIRST_LAST = "ACTION_AUDIO_FIRST_LAST";
 
     private AudioBinder mAudioBinder;
     private MediaPlayer mMediaPlayer;
+    private ArrayList<MediaFile> mMediaFiles;
+    private int mCurrentMediaFilePosition;
     private MediaFile mCurrentMediaFile;
 
     @Override
@@ -44,8 +52,11 @@ public class AudioService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Logger.i(TAG, "onStartCommand");
-        mCurrentMediaFile = intent.getParcelableExtra(EXTRA_MEDIA_FILE);
-        mAudioBinder.playAudio();
+        if (intent != null && intent.getExtras() != null) {
+            mCurrentMediaFilePosition = intent.getExtras().getInt(EXTRA_CURRENT_MEDIA_FILE_POSITION);
+            mMediaFiles = intent.getExtras().getParcelableArrayList(EXTRA_MEDIA_FILES);
+            mAudioBinder.playAudio(mCurrentMediaFilePosition);
+        }
         return START_STICKY;
     }
 
@@ -67,6 +78,13 @@ public class AudioService extends Service {
         sendBroadcast(intent);
     }
 
+    private void notifyFirstAndLast() {
+        Intent intent = new Intent(ACTION_AUDIO_FIRST_LAST);
+        intent.putExtra(EXTRA_CURRENT_MEDIA_FILE_POSITION, mCurrentMediaFilePosition);
+        intent.putExtra(EXTRA_TOTAL_MEDIA_FILE, mMediaFiles.size());
+        sendBroadcast(intent);
+    }
+
     private MediaPlayer.OnPreparedListener mOnPreparedListener = new MediaPlayer.OnPreparedListener() {
         @Override
         public void onPrepared(MediaPlayer mp) {
@@ -79,28 +97,32 @@ public class AudioService extends Service {
         @Override
         public void onCompletion(MediaPlayer mp) {
             notifyCompletion();
+            mAudioBinder.next();
         }
     };
 
     public final class AudioBinder extends Binder {
 
-        public void pre() {
+        public void playAudio(int position) {
+            if (mMediaFiles != null && mMediaFiles.size() > 0 && position >= 0 && position <= mMediaFiles.size() - 1) {
+                mCurrentMediaFilePosition = position;
+                mCurrentMediaFile = mMediaFiles.get(mCurrentMediaFilePosition);
 
-        }
+                if (mMediaPlayer != null) {
+                    mMediaPlayer.release();
+                    mMediaPlayer = null;
+                }
+                mMediaPlayer = new MediaPlayer();
+                mMediaPlayer.setOnPreparedListener(mOnPreparedListener);
+                mMediaPlayer.setOnCompletionListener(mOnCompletionListener);
+                try {
+                    mMediaPlayer.setDataSource(mCurrentMediaFile.path);
+                    mMediaPlayer.prepareAsync();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
 
-        public void playAudio() {
-            if (mMediaPlayer != null) {
-                mMediaPlayer.release();
-                mMediaPlayer = null;
-            }
-            mMediaPlayer = new MediaPlayer();
-            mMediaPlayer.setOnPreparedListener(mOnPreparedListener);
-            mMediaPlayer.setOnCompletionListener(mOnCompletionListener);
-            try {
-                mMediaPlayer.setDataSource(mCurrentMediaFile.path);
-                mMediaPlayer.prepareAsync();
-            } catch (IOException e) {
-                e.printStackTrace();
+                notifyFirstAndLast();
             }
         }
 
@@ -116,8 +138,12 @@ public class AudioService extends Service {
             }
         }
 
-        public void next() {
+        public void pre() {
+            playAudio(mCurrentMediaFilePosition - 1);
+        }
 
+        public void next() {
+            playAudio(mCurrentMediaFilePosition + 1);
         }
 
         public void seekTo(int msec) {

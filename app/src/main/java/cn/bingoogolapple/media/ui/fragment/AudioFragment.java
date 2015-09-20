@@ -22,6 +22,7 @@ import cn.bingoogolapple.androidcommon.adapter.BGAViewHolderHelper;
 import cn.bingoogolapple.media.R;
 import cn.bingoogolapple.media.engine.MediaScanner;
 import cn.bingoogolapple.media.model.MediaFile;
+import cn.bingoogolapple.media.service.AudioService;
 import cn.bingoogolapple.media.ui.activity.AudioActivity;
 import cn.bingoogolapple.media.ui.widget.Divider;
 import cn.bingoogolapple.media.util.StringUtil;
@@ -94,8 +95,10 @@ public class AudioFragment extends BaseFragment implements BGAOnRVItemClickListe
     @Override
     public void onRVItemClick(ViewGroup viewGroup, View view, int position) {
         Intent intent = new Intent(mActivity, AudioActivity.class);
-        intent.putExtra(AudioActivity.EXTRA_CURRENT_MEDIA_FILE_POSITION, position);
-        intent.putParcelableArrayListExtra(AudioActivity.EXTRA_MEDIA_FILES, (ArrayList<? extends Parcelable>) mAudioAdapter.getDatas());
+        Bundle bundle = new Bundle();
+        bundle.putInt(AudioService.EXTRA_CURRENT_MEDIA_FILE_POSITION, position);
+        bundle.putParcelableArrayList(AudioService.EXTRA_MEDIA_FILES, (ArrayList<? extends Parcelable>) mAudioAdapter.getDatas());
+        intent.putExtras(bundle);
         mActivity.forward(intent);
     }
 

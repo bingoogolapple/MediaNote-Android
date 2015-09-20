@@ -16,8 +16,6 @@ import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
-import java.util.ArrayList;
-
 import cn.bingoogolapple.media.R;
 import cn.bingoogolapple.media.model.MediaFile;
 import cn.bingoogolapple.media.service.AudioService;
@@ -31,11 +29,8 @@ import cn.bingoogolapple.titlebar.BGATitlebar;
  * 描述:
  */
 public class AudioActivity extends BaseActivity {
-    public static final String EXTRA_MEDIA_FILES = "EXTRA_MEDIA_FILES";
-    public static final String EXTRA_CURRENT_MEDIA_FILE_POSITION = "EXTRA_CURRENT_MEDIA_FILE_POSITION";
     private static final int WHAT_UPDATE_PROGRESS = 0;
-    private ArrayList<MediaFile> mMediaFiles;
-    private int mCurrentMediaFilePosition;
+
     private ImageView mAnimIv;
     private AnimationDrawable mAnim;
     private TextView mArtistTv;
@@ -136,15 +131,14 @@ public class AudioActivity extends BaseActivity {
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(AudioService.ACTION_AUDIO_PREPARED);
         intentFilter.addAction(AudioService.ACTION_AUDIO_COMPLETION);
+        intentFilter.addAction(AudioService.ACTION_AUDIO_FIRST_LAST);
         registerReceiver(mAudioServiceReceiver, intentFilter);
     }
 
     private void bindAudioService() {
         mAudioServiceConnection = new AudioServiceConnection();
         Intent intent = new Intent(this, AudioService.class);
-        mMediaFiles = getIntent().getParcelableArrayListExtra(EXTRA_MEDIA_FILES);
-        mCurrentMediaFilePosition = getIntent().getIntExtra(EXTRA_CURRENT_MEDIA_FILE_POSITION, 0);
-        intent.putExtra(AudioService.EXTRA_MEDIA_FILE, mMediaFiles.get(mCurrentMediaFilePosition));
+        intent.putExtras(getIntent().getExtras());
         startService(intent);
         bindService(intent, mAudioServiceConnection, BIND_AUTO_CREATE);
     }
@@ -238,6 +232,12 @@ public class AudioActivity extends BaseActivity {
                     mTimeTv.setText(StringUtil.formatTime(mediaFile.duration) + "/" + StringUtil.formatTime(mediaFile.duration));
                     mProgressSb.setProgress(mediaFile.duration);
 
+                    break;
+                case AudioService.ACTION_AUDIO_FIRST_LAST:
+                    int currentPosition = intent.getIntExtra(AudioService.EXTRA_CURRENT_MEDIA_FILE_POSITION, 0);
+                    int total = intent.getIntExtra(AudioService.EXTRA_TOTAL_MEDIA_FILE, 0);
+                    mPreIv.setEnabled(currentPosition != 0);
+                    mNextIv.setEnabled(currentPosition != total - 1);
                     break;
             }
 

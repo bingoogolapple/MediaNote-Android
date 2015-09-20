@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:drawable="@mipmap/btn_pre_gray" android:state_enabled="false" />
     <item android:drawable="@mipmap/btn_now_playing_play_prevoius_pressed" android:state_pressed="true" />
     <item android:drawable="@mipmap/btn_now_playing_play_prevoius" />
 </selector>

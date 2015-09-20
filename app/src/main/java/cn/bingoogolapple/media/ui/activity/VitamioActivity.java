@@ -332,7 +332,7 @@ public class VitamioActivity extends BaseActivity {
     }
 
     private void playOwnVideo(int position) {
-        if (mMediaFiles != null && mMediaFiles.size() > 0 && position >= 0 && position < mMediaFiles.size() - 1) {
+        if (mMediaFiles != null && mMediaFiles.size() > 0 && position >= 0 && position <= mMediaFiles.size() - 1) {
             mCurrentMediaFilePosition = position;
             mCurrentMediaFile = mMediaFiles.get(mCurrentMediaFilePosition);
 
