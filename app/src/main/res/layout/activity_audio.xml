@@ -18,7 +18,7 @@
             android:src="@anim/audio_player_anim" />
 
         <TextView
-            android:id="@+id/tv_audio_name"
+            android:id="@+id/tv_audio_artist"
             style="@style/WrapWrap"
             android:layout_alignBottom="@id/iv_audio_anim"
             android:layout_centerHorizontal="true"

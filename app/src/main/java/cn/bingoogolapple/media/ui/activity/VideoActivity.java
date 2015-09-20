@@ -429,8 +429,7 @@ public class VideoActivity extends BaseActivity {
 
     @Override
     protected void onDestroy() {
-        mHandler.removeMessages(WHAT_UPDATE_SYSTIME);
-        mHandler.removeMessages(WHAT_UPDATE_PROGRESS);
+        mHandler.removeCallbacksAndMessages(null);
         unregisterReceiver(mBatteryBroadcastReceiver);
         super.onDestroy();
     }

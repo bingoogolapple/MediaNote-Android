@@ -20,7 +20,8 @@ import cn.bingoogolapple.media.util.Logger;
 public class AudioService extends Service {
     private static final String TAG = AudioService.class.getSimpleName();
     public static final String EXTRA_MEDIA_FILE = "EXTRA_MEDIA_FILE";
-    public static final String ACTION_MEDIA_PREPARED = "ACTION_MEDIA_PREPARED";
+    public static final String ACTION_AUDIO_PREPARED = "ACTION_AUDIO_PREPARED";
+    public static final String ACTION_AUDIO_COMPLETION = "ACTION_AUDIO_COMPLETION";
 
     private AudioBinder mAudioBinder;
     private MediaPlayer mMediaPlayer;
@@ -55,10 +56,31 @@ public class AudioService extends Service {
     }
 
     private void notifyPrepared() {
-        Intent intent = new Intent(ACTION_MEDIA_PREPARED);
+        Intent intent = new Intent(ACTION_AUDIO_PREPARED);
         intent.putExtra(EXTRA_MEDIA_FILE, mCurrentMediaFile);
         sendBroadcast(intent);
     }
+
+    private void notifyCompletion() {
+        Intent intent = new Intent(ACTION_AUDIO_COMPLETION);
+        intent.putExtra(EXTRA_MEDIA_FILE, mCurrentMediaFile);
+        sendBroadcast(intent);
+    }
+
+    private MediaPlayer.OnPreparedListener mOnPreparedListener = new MediaPlayer.OnPreparedListener() {
+        @Override
+        public void onPrepared(MediaPlayer mp) {
+            notifyPrepared();
+            mAudioBinder.start();
+        }
+    };
+
+    private MediaPlayer.OnCompletionListener mOnCompletionListener = new MediaPlayer.OnCompletionListener() {
+        @Override
+        public void onCompletion(MediaPlayer mp) {
+            notifyCompletion();
+        }
+    };
 
     public final class AudioBinder extends Binder {
 
@@ -72,13 +94,8 @@ public class AudioService extends Service {
                 mMediaPlayer = null;
             }
             mMediaPlayer = new MediaPlayer();
-            mMediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-                @Override
-                public void onPrepared(MediaPlayer mp) {
-                    mMediaPlayer.start();
-                    notifyPrepared();
-                }
-            });
+            mMediaPlayer.setOnPreparedListener(mOnPreparedListener);
+            mMediaPlayer.setOnCompletionListener(mOnCompletionListener);
             try {
                 mMediaPlayer.setDataSource(mCurrentMediaFile.path);
                 mMediaPlayer.prepareAsync();
@@ -103,9 +120,24 @@ public class AudioService extends Service {
 
         }
 
+        public void seekTo(int msec) {
+            if (mMediaPlayer != null) {
+                mMediaPlayer.seekTo(msec);
+            }
+        }
+
         public boolean isPlaying() {
             return mMediaPlayer != null ? mMediaPlayer.isPlaying() : false;
         }
+
+        public int getCurrentPosition() {
+            return mMediaPlayer != null ? mMediaPlayer.getCurrentPosition() : 0;
+        }
+
+        public int getDuration() {
+            return mMediaPlayer != null ? mMediaPlayer.getDuration() : 0;
+        }
+
     }
 
 }

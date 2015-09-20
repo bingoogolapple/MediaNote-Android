@@ -8,7 +8,9 @@ import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.graphics.drawable.AnimationDrawable;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Message;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.SeekBar;
@@ -20,6 +22,7 @@ import cn.bingoogolapple.media.R;
 import cn.bingoogolapple.media.model.MediaFile;
 import cn.bingoogolapple.media.service.AudioService;
 import cn.bingoogolapple.media.util.Logger;
+import cn.bingoogolapple.media.util.StringUtil;
 import cn.bingoogolapple.titlebar.BGATitlebar;
 
 /**
@@ -30,12 +33,12 @@ import cn.bingoogolapple.titlebar.BGATitlebar;
 public class AudioActivity extends BaseActivity {
     public static final String EXTRA_MEDIA_FILES = "EXTRA_MEDIA_FILES";
     public static final String EXTRA_CURRENT_MEDIA_FILE_POSITION = "EXTRA_CURRENT_MEDIA_FILE_POSITION";
+    private static final int WHAT_UPDATE_PROGRESS = 0;
     private ArrayList<MediaFile> mMediaFiles;
-    private MediaFile mCurrentMediaFile;
     private int mCurrentMediaFilePosition;
     private ImageView mAnimIv;
     private AnimationDrawable mAnim;
-    private TextView mNameTv;
+    private TextView mArtistTv;
 
     private TextView mTimeTv;
     private SeekBar mProgressSb;
@@ -49,12 +52,23 @@ public class AudioActivity extends BaseActivity {
     private AudioServiceConnection mAudioServiceConnection;
     private AudioService.AudioBinder mAudioBinder;
 
+    private Handler mHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            switch (msg.what) {
+                case WHAT_UPDATE_PROGRESS:
+                    updateProgress();
+                    break;
+            }
+        }
+    };
+
     @Override
     protected void initView(Bundle savedInstanceState) {
         setContentView(R.layout.activity_audio);
         mTitlebar = getViewById(R.id.titlebar);
         mAnimIv = getViewById(R.id.iv_audio_anim);
-        mNameTv = getViewById(R.id.tv_audio_name);
+        mArtistTv = getViewById(R.id.tv_audio_artist);
 
         mTimeTv = getViewById(R.id.tv_audio_time);
         mProgressSb = getViewById(R.id.sb_audio_progress);
@@ -77,6 +91,36 @@ public class AudioActivity extends BaseActivity {
         mPreIv.setOnClickListener(this);
         mPlayIv.setOnClickListener(this);
         mNextIv.setOnClickListener(this);
+        mProgressSb.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+            }
+
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                if (fromUser) {
+                    mHandler.removeMessages(WHAT_UPDATE_PROGRESS);
+                    mAudioBinder.seekTo(progress);
+                    updateProgress();
+
+                    if (!mAudioBinder.isPlaying()) {
+                        mAudioBinder.start();
+                        updatePlayIvImageResource();
+                    }
+                }
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+            }
+        });
+    }
+
+    private void updateProgress() {
+        int progress = mAudioBinder.getCurrentPosition();
+        mTimeTv.setText(StringUtil.formatTime(progress) + "/" + StringUtil.formatTime(mAudioBinder.getDuration()));
+        mProgressSb.setProgress(progress);
+        mHandler.sendEmptyMessageDelayed(WHAT_UPDATE_PROGRESS, 1000);
     }
 
     @Override
@@ -89,7 +133,10 @@ public class AudioActivity extends BaseActivity {
 
     private void registerAudioServiceReceiver() {
         mAudioServiceReceiver = new AudioServiceReceiver();
-        registerReceiver(mAudioServiceReceiver, new IntentFilter(AudioService.ACTION_MEDIA_PREPARED));
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(AudioService.ACTION_AUDIO_PREPARED);
+        intentFilter.addAction(AudioService.ACTION_AUDIO_COMPLETION);
+        registerReceiver(mAudioServiceReceiver, intentFilter);
     }
 
     private void bindAudioService() {
@@ -110,6 +157,7 @@ public class AudioActivity extends BaseActivity {
 
     @Override
     protected void onDestroy() {
+        mHandler.removeCallbacksAndMessages(null);
         unregisterReceiver(mAudioServiceReceiver);
         unbindAudioService();
         super.onDestroy();
@@ -169,12 +217,27 @@ public class AudioActivity extends BaseActivity {
     private final class AudioServiceReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
+            MediaFile mediaFile = intent.getParcelableExtra(AudioService.EXTRA_MEDIA_FILE);
             switch (intent.getAction()) {
-                case AudioService.ACTION_MEDIA_PREPARED:
+                case AudioService.ACTION_AUDIO_PREPARED:
                     updatePlayIvImageResource();
-                    mCurrentMediaFile = intent.getParcelableExtra(AudioService.EXTRA_MEDIA_FILE);
-                    mTitlebar.setTitleText(mCurrentMediaFile.name);
-                    mNameTv.setText(mCurrentMediaFile.artist);
+
+                    mTitlebar.setTitleText(mediaFile.name);
+                    mArtistTv.setText(mediaFile.artist);
+
+                    mTimeTv.setText("00:00/" + StringUtil.formatTime(mediaFile.duration));
+                    mProgressSb.setMax(mediaFile.duration);
+
+                    updateProgress();
+                    break;
+                case AudioService.ACTION_AUDIO_COMPLETION:
+                    updatePlayIvImageResource();
+
+                    mHandler.removeMessages(WHAT_UPDATE_PROGRESS);
+
+                    mTimeTv.setText(StringUtil.formatTime(mediaFile.duration) + "/" + StringUtil.formatTime(mediaFile.duration));
+                    mProgressSb.setProgress(mediaFile.duration);
+
                     break;
             }
 
