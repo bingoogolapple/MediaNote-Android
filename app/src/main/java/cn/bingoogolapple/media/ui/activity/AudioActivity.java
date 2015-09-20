@@ -216,6 +216,7 @@ public class AudioActivity extends BaseActivity {
         public void onServiceConnected(ComponentName name, IBinder service) {
             Logger.i(TAG, "onServiceConnected");
             mAudioBinder = (AudioService.AudioBinder) service;
+            updateRepeatModeIvImageResource();
         }
 
         @Override

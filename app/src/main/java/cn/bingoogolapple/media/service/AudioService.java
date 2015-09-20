@@ -12,6 +12,7 @@ import java.util.ArrayList;
 
 import cn.bingoogolapple.media.model.MediaFile;
 import cn.bingoogolapple.media.util.Logger;
+import cn.bingoogolapple.media.util.SPUtil;
 
 /**
  * 作者:王浩 邮件:bingoogolapple@gmail.com
@@ -29,6 +30,8 @@ public class AudioService extends Service {
     public static final String ACTION_AUDIO_COMPLETION = "ACTION_AUDIO_COMPLETION";
     public static final String ACTION_AUDIO_FIRST_LAST = "ACTION_AUDIO_FIRST_LAST";
 
+    private static final String SP_REPEAT_MODE = "SP_REPEAT_MODE";
+
     private AudioBinder mAudioBinder;
     private MediaPlayer mMediaPlayer;
     private ArrayList<MediaFile> mMediaFiles;
@@ -42,6 +45,7 @@ public class AudioService extends Service {
         super.onCreate();
         Logger.i(TAG, "onCreate");
         mAudioBinder = new AudioBinder();
+        mRepeatMode = RepeatMode.values()[SPUtil.getInt(SP_REPEAT_MODE)];
     }
 
     @Nullable
@@ -99,7 +103,21 @@ public class AudioService extends Service {
         @Override
         public void onCompletion(MediaPlayer mp) {
             notifyCompletion();
-            mAudioBinder.next();
+            switch (mRepeatMode) {
+                case Order:
+                    mAudioBinder.next();
+                    break;
+                case SingleRepeat:
+                    mAudioBinder.playAudio(mCurrentMediaFilePosition);
+                    break;
+                case AllRepeat:
+                    if (mCurrentMediaFilePosition == mMediaFiles.size() - 1) {
+                        mAudioBinder.playAudio(0);
+                    } else {
+                        mAudioBinder.next();
+                    }
+                    break;
+            }
         }
     };
 
@@ -178,6 +196,7 @@ public class AudioService extends Service {
                     mRepeatMode = RepeatMode.Order;
                     break;
             }
+            SPUtil.putInt(SP_REPEAT_MODE, mRepeatMode.ordinal());
         }
 
         public RepeatMode getRepeatMode() {
