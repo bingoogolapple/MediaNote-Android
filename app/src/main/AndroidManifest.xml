@@ -81,6 +81,8 @@
             android:name=".ui.activity.AudioActivity"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="stateAlwaysHidden" />
+
+        <service android:name=".service.AudioService" />
     </application>
 
 </manifest>

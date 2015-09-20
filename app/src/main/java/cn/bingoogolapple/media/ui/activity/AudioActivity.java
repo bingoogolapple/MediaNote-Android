@@ -1,7 +1,14 @@
 package cn.bingoogolapple.media.ui.activity;
 
+import android.content.BroadcastReceiver;
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.ServiceConnection;
 import android.graphics.drawable.AnimationDrawable;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.SeekBar;
@@ -11,7 +18,8 @@ import java.util.ArrayList;
 
 import cn.bingoogolapple.media.R;
 import cn.bingoogolapple.media.model.MediaFile;
-import cn.bingoogolapple.media.util.ToastUtil;
+import cn.bingoogolapple.media.service.AudioService;
+import cn.bingoogolapple.media.util.Logger;
 import cn.bingoogolapple.titlebar.BGATitlebar;
 
 /**
@@ -35,6 +43,11 @@ public class AudioActivity extends BaseActivity {
     private ImageView mPreIv;
     private ImageView mPlayIv;
     private ImageView mNextIv;
+
+    private AudioServiceReceiver mAudioServiceReceiver;
+
+    private AudioServiceConnection mAudioServiceConnection;
+    private AudioService.AudioBinder mAudioBinder;
 
     @Override
     protected void initView(Bundle savedInstanceState) {
@@ -68,37 +81,103 @@ public class AudioActivity extends BaseActivity {
 
     @Override
     protected void processLogic(Bundle savedInstanceState) {
-        mMediaFiles = getIntent().getParcelableArrayListExtra(EXTRA_MEDIA_FILES);
-        mCurrentMediaFilePosition = getIntent().getIntExtra(EXTRA_CURRENT_MEDIA_FILE_POSITION, 0);
-        mCurrentMediaFile = mMediaFiles.get(mCurrentMediaFilePosition);
-
-        mTitlebar.setTitleText(mCurrentMediaFile.name);
-        mNameTv.setText(mCurrentMediaFile.artist);
+        registerAudioServiceReceiver();
+        bindAudioService();
 
         mAnim = (AnimationDrawable) mAnimIv.getDrawable();
-        mAnim.start();
+    }
+
+    private void registerAudioServiceReceiver() {
+        mAudioServiceReceiver = new AudioServiceReceiver();
+        registerReceiver(mAudioServiceReceiver, new IntentFilter(AudioService.ACTION_MEDIA_PREPARED));
+    }
+
+    private void bindAudioService() {
+        mAudioServiceConnection = new AudioServiceConnection();
+        Intent intent = new Intent(this, AudioService.class);
+        mMediaFiles = getIntent().getParcelableArrayListExtra(EXTRA_MEDIA_FILES);
+        mCurrentMediaFilePosition = getIntent().getIntExtra(EXTRA_CURRENT_MEDIA_FILE_POSITION, 0);
+        intent.putExtra(AudioService.EXTRA_MEDIA_FILE, mMediaFiles.get(mCurrentMediaFilePosition));
+        startService(intent);
+        bindService(intent, mAudioServiceConnection, BIND_AUTO_CREATE);
+    }
+
+    private void unbindAudioService() {
+        if (mAudioServiceConnection != null) {
+            unbindService(mAudioServiceConnection);
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        unregisterReceiver(mAudioServiceReceiver);
+        unbindAudioService();
+        super.onDestroy();
     }
 
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.iv_audio_mode:
-                ToastUtil.show("播放模式");
                 break;
             case R.id.iv_audio_pre:
-                ToastUtil.show("上一首");
+                mAudioBinder.pre();
                 break;
             case R.id.iv_audio_play:
-                ToastUtil.show("播放");
+                if (mAudioBinder.isPlaying()) {
+                    mAudioBinder.pause();
+                } else {
+                    mAudioBinder.start();
+                }
+                updatePlayIvImageResource();
                 break;
             case R.id.iv_audio_next:
-                ToastUtil.show("下一首");
+                mAudioBinder.next();
                 break;
+        }
+    }
+
+    private void updatePlayIvImageResource() {
+        if (mAudioBinder.isPlaying()) {
+            mPlayIv.setImageResource(R.drawable.selector_btn_audio_pause);
+            mAnim.start();
+        } else {
+            mPlayIv.setImageResource(R.drawable.selector_btn_audio_play);
+            mAnim.stop();
         }
     }
 
     @Override
     public void onBackPressed() {
         backward();
+    }
+
+    private final class AudioServiceConnection implements ServiceConnection {
+
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            Logger.i(TAG, "onServiceConnected");
+            mAudioBinder = (AudioService.AudioBinder) service;
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            Logger.i(TAG, "onServiceDisconnected");
+        }
+    }
+
+    private final class AudioServiceReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            switch (intent.getAction()) {
+                case AudioService.ACTION_MEDIA_PREPARED:
+                    updatePlayIvImageResource();
+                    mCurrentMediaFile = intent.getParcelableExtra(AudioService.EXTRA_MEDIA_FILE);
+                    mTitlebar.setTitleText(mCurrentMediaFile.name);
+                    mNameTv.setText(mCurrentMediaFile.artist);
+                    break;
+            }
+
+        }
     }
 }

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     style="@style/MatchMatch.Vertical"
     android:background="@mipmap/base_bg">
 
@@ -21,9 +22,9 @@
             style="@style/WrapWrap"
             android:layout_alignBottom="@id/iv_audio_anim"
             android:layout_centerHorizontal="true"
-            android:text="音频名称"
             android:textColor="@color/white"
-            android:textSize="@dimen/textSize_18" />
+            android:textSize="@dimen/textSize_18"
+            tools:text="音频名称" />
     </RelativeLayout>
 
     <TextView
@@ -38,9 +39,9 @@
         style="@style/MatchWrap"
         android:gravity="right"
         android:paddingRight="@dimen/size_level3"
-        android:text="2:33/3:50"
         android:textColor="@color/white"
-        android:textSize="@dimen/textSize_14" />
+        android:textSize="@dimen/textSize_14"
+        tools:text="2:33/3:50" />
 
     <SeekBar
         android:id="@+id/sb_audio_progress"
