@@ -161,6 +161,8 @@ public class AudioActivity extends BaseActivity {
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.iv_audio_mode:
+                mAudioBinder.switchPlayMode();
+                updateRepeatModeIvImageResource();
                 break;
             case R.id.iv_audio_pre:
                 mAudioBinder.pre();
@@ -175,6 +177,20 @@ public class AudioActivity extends BaseActivity {
                 break;
             case R.id.iv_audio_next:
                 mAudioBinder.next();
+                break;
+        }
+    }
+
+    private void updateRepeatModeIvImageResource() {
+        switch (mAudioBinder.getRepeatMode()) {
+            case Order:
+                mModeIv.setImageResource(R.drawable.selector_audio_mode_normal);
+                break;
+            case SingleRepeat:
+                mModeIv.setImageResource(R.drawable.selector_audio_mode_single_repeat);
+                break;
+            case AllRepeat:
+                mModeIv.setImageResource(R.drawable.selector_audio_mode_all_repeat);
                 break;
         }
     }

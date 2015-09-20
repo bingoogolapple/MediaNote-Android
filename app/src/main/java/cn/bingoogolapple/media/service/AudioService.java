@@ -35,6 +35,8 @@ public class AudioService extends Service {
     private int mCurrentMediaFilePosition;
     private MediaFile mCurrentMediaFile;
 
+    private RepeatMode mRepeatMode = RepeatMode.Order;
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -164,6 +166,27 @@ public class AudioService extends Service {
             return mMediaPlayer != null ? mMediaPlayer.getDuration() : 0;
         }
 
+        public void switchPlayMode() {
+            switch (mRepeatMode) {
+                case Order:
+                    mRepeatMode = RepeatMode.SingleRepeat;
+                    break;
+                case SingleRepeat:
+                    mRepeatMode = RepeatMode.AllRepeat;
+                    break;
+                case AllRepeat:
+                    mRepeatMode = RepeatMode.Order;
+                    break;
+            }
+        }
+
+        public RepeatMode getRepeatMode() {
+            return mRepeatMode;
+        }
+    }
+
+    public enum RepeatMode {
+        Order, SingleRepeat, AllRepeat
     }
 
 }
