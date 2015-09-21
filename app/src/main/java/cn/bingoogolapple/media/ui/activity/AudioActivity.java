@@ -132,7 +132,7 @@ public class AudioActivity extends BaseActivity {
         intentFilter.addAction(AudioService.ACTION_AUDIO_PREPARED);
         intentFilter.addAction(AudioService.ACTION_AUDIO_COMPLETION);
         intentFilter.addAction(AudioService.ACTION_AUDIO_FIRST_LAST);
-        registerReceiver(mAudioServiceReceiver, intentFilter);
+        mLocalBroadcastManager.registerReceiver(mAudioServiceReceiver, intentFilter);
     }
 
     private void bindAudioService() {
@@ -152,7 +152,7 @@ public class AudioActivity extends BaseActivity {
     @Override
     protected void onDestroy() {
         mHandler.removeCallbacksAndMessages(null);
-        unregisterReceiver(mAudioServiceReceiver);
+        mLocalBroadcastManager.unregisterReceiver(mAudioServiceReceiver);
         unbindAudioService();
         super.onDestroy();
     }

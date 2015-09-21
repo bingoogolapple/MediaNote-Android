@@ -6,6 +6,7 @@ import android.media.MediaPlayer;
 import android.os.Binder;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
+import android.support.v4.content.LocalBroadcastManager;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -40,10 +41,13 @@ public class AudioService extends Service {
 
     private RepeatMode mRepeatMode = RepeatMode.Order;
 
+    private LocalBroadcastManager mLocalBroadcastManager;
+
     @Override
     public void onCreate() {
         super.onCreate();
         Logger.i(TAG, "onCreate");
+        mLocalBroadcastManager = LocalBroadcastManager.getInstance(this);
         mAudioBinder = new AudioBinder();
         mRepeatMode = RepeatMode.values()[SPUtil.getInt(SP_REPEAT_MODE)];
     }
@@ -75,20 +79,20 @@ public class AudioService extends Service {
     private void notifyPrepared() {
         Intent intent = new Intent(ACTION_AUDIO_PREPARED);
         intent.putExtra(EXTRA_MEDIA_FILE, mCurrentMediaFile);
-        sendBroadcast(intent);
+        mLocalBroadcastManager.sendBroadcast(intent);
     }
 
     private void notifyCompletion() {
         Intent intent = new Intent(ACTION_AUDIO_COMPLETION);
         intent.putExtra(EXTRA_MEDIA_FILE, mCurrentMediaFile);
-        sendBroadcast(intent);
+        mLocalBroadcastManager.sendBroadcast(intent);
     }
 
     private void notifyFirstAndLast() {
         Intent intent = new Intent(ACTION_AUDIO_FIRST_LAST);
         intent.putExtra(EXTRA_CURRENT_MEDIA_FILE_POSITION, mCurrentMediaFilePosition);
         intent.putExtra(EXTRA_TOTAL_MEDIA_FILE, mMediaFiles.size());
-        sendBroadcast(intent);
+        mLocalBroadcastManager.sendBroadcast(intent);
     }
 
     private MediaPlayer.OnPreparedListener mOnPreparedListener = new MediaPlayer.OnPreparedListener() {

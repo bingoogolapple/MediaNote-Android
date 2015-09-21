@@ -22,7 +22,6 @@ public class App extends Application {
     public void onCreate() {
         super.onCreate();
         sInstance = this;
-
     }
 
     public static App getInstance() {

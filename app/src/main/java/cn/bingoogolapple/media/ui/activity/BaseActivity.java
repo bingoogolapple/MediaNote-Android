@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
 import android.support.annotation.StringRes;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 
@@ -23,6 +24,7 @@ public abstract class BaseActivity extends AppCompatActivity implements View.OnC
     protected App mApp;
     protected BGATitlebar mTitlebar;
     private SweetAlertDialog mLoadingDialog;
+    protected LocalBroadcastManager mLocalBroadcastManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,6 +32,7 @@ public abstract class BaseActivity extends AppCompatActivity implements View.OnC
         TAG = this.getClass().getSimpleName();
         mApp = App.getInstance();
         mApp.addActivity(this);
+        mLocalBroadcastManager = LocalBroadcastManager.getInstance(this);
         initView(savedInstanceState);
         setListener();
         processLogic(savedInstanceState);
