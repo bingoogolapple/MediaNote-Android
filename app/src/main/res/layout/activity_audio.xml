@@ -27,12 +27,7 @@
             tools:text="音频名称" />
     </RelativeLayout>
 
-    <TextView
-        style="@style/MatchAuto"
-        android:gravity="center"
-        android:text="我是歌词"
-        android:textColor="@color/white"
-        android:textSize="@dimen/textSize_18" />
+    <cn.bingoogolapple.media.ui.widget.LyricView style="@style/MatchAuto" />
 
     <TextView
         android:id="@+id/tv_audio_time"
