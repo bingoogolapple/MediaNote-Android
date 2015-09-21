@@ -42,8 +42,6 @@ public class AudioActivity extends BaseActivity {
     private ImageView mPlayIv;
     private ImageView mNextIv;
 
-    private AudioServiceReceiver mAudioServiceReceiver;
-
     private AudioServiceConnection mAudioServiceConnection;
     private AudioService.AudioBinder mAudioBinder;
 
@@ -127,11 +125,10 @@ public class AudioActivity extends BaseActivity {
     }
 
     private void registerAudioServiceReceiver() {
-        mAudioServiceReceiver = new AudioServiceReceiver();
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(AudioService.ACTION_AUDIO_PREPARED);
         intentFilter.addAction(AudioService.ACTION_AUDIO_COMPLETION);
-        intentFilter.addAction(AudioService.ACTION_AUDIO_FIRST_LAST);
+        intentFilter.addAction(AudioService.ACTION_AUDIO_UPDATE_ICON);
         mLocalBroadcastManager.registerReceiver(mAudioServiceReceiver, intentFilter);
     }
 
@@ -173,7 +170,6 @@ public class AudioActivity extends BaseActivity {
                 } else {
                     mAudioBinder.start();
                 }
-                updatePlayIvImageResource();
                 break;
             case R.id.iv_audio_next:
                 mAudioBinder.next();
@@ -225,7 +221,7 @@ public class AudioActivity extends BaseActivity {
         }
     }
 
-    private final class AudioServiceReceiver extends BroadcastReceiver {
+    private BroadcastReceiver mAudioServiceReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             MediaFile mediaFile = intent.getParcelableExtra(AudioService.EXTRA_MEDIA_FILE);
@@ -250,14 +246,16 @@ public class AudioActivity extends BaseActivity {
                     mProgressSb.setProgress(mediaFile.duration);
 
                     break;
-                case AudioService.ACTION_AUDIO_FIRST_LAST:
+                case AudioService.ACTION_AUDIO_UPDATE_ICON:
                     int currentPosition = intent.getIntExtra(AudioService.EXTRA_CURRENT_MEDIA_FILE_POSITION, 0);
                     int total = intent.getIntExtra(AudioService.EXTRA_TOTAL_MEDIA_FILE, 0);
                     mPreIv.setEnabled(currentPosition != 0);
                     mNextIv.setEnabled(currentPosition != total - 1);
+
+                    updatePlayIvImageResource();
                     break;
             }
 
         }
-    }
+    };
 }

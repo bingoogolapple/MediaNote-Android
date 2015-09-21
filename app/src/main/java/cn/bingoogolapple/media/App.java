@@ -2,6 +2,8 @@ package cn.bingoogolapple.media;
 
 import android.app.Activity;
 import android.app.Application;
+import android.app.Notification;
+import android.support.v4.app.NotificationManagerCompat;
 
 import java.util.LinkedList;
 
@@ -17,11 +19,13 @@ public class App extends Application {
     private static App sInstance;
     private long mLastPressBackKeyTime;
     private LinkedList<Activity> mActivities = new LinkedList<>();
+    private NotificationManagerCompat mNotificationManager;
 
     @Override
     public void onCreate() {
         super.onCreate();
         sInstance = this;
+        mNotificationManager = NotificationManagerCompat.from(this);
     }
 
     public static App getInstance() {
@@ -77,5 +81,13 @@ public class App extends Application {
 //        android.os.Process.killProcess(android.os.Process.myPid());
 //        System.gc();
 //        System.exit(0);
+    }
+
+    public void addNotification(int id, Notification notification) {
+        mNotificationManager.notify(id, notification);
+    }
+
+    public void removeNotification(int id) {
+        mNotificationManager.cancel(id);
     }
 }

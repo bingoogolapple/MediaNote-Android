@@ -79,6 +79,7 @@
 
         <activity
             android:name=".ui.activity.AudioActivity"
+            android:launchMode="singleTop"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="stateAlwaysHidden" />
 
