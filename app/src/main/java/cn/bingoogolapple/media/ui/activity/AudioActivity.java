@@ -19,6 +19,7 @@ import android.widget.TextView;
 import cn.bingoogolapple.media.R;
 import cn.bingoogolapple.media.model.MediaFile;
 import cn.bingoogolapple.media.service.AudioService;
+import cn.bingoogolapple.media.ui.widget.LyricView;
 import cn.bingoogolapple.media.util.Logger;
 import cn.bingoogolapple.media.util.StringUtil;
 import cn.bingoogolapple.titlebar.BGATitlebar;
@@ -30,10 +31,13 @@ import cn.bingoogolapple.titlebar.BGATitlebar;
  */
 public class AudioActivity extends BaseActivity {
     private static final int WHAT_UPDATE_PROGRESS = 0;
+    private static final int WHAT_UPDATE_LYRIC = 1;
 
     private ImageView mAnimIv;
     private AnimationDrawable mAnim;
     private TextView mArtistTv;
+
+    private LyricView mLyricView;
 
     private TextView mTimeTv;
     private SeekBar mProgressSb;
@@ -52,6 +56,9 @@ public class AudioActivity extends BaseActivity {
                 case WHAT_UPDATE_PROGRESS:
                     updateProgress();
                     break;
+                case WHAT_UPDATE_LYRIC:
+                    updateLyric();
+                    break;
             }
         }
     };
@@ -62,6 +69,8 @@ public class AudioActivity extends BaseActivity {
         mTitlebar = getViewById(R.id.titlebar);
         mAnimIv = getViewById(R.id.iv_audio_anim);
         mArtistTv = getViewById(R.id.tv_audio_artist);
+
+        mLyricView = getViewById(R.id.lyricView);
 
         mTimeTv = getViewById(R.id.tv_audio_time);
         mProgressSb = getViewById(R.id.sb_audio_progress);
@@ -96,6 +105,9 @@ public class AudioActivity extends BaseActivity {
                     mAudioBinder.seekTo(progress);
                     updateProgress();
 
+                    mHandler.removeMessages(WHAT_UPDATE_LYRIC);
+                    updateLyric();
+
                     if (!mAudioBinder.isPlaying()) {
                         mAudioBinder.start();
                         updatePlayIvImageResource();
@@ -114,6 +126,11 @@ public class AudioActivity extends BaseActivity {
         mTimeTv.setText(StringUtil.formatTime(progress) + "/" + StringUtil.formatTime(mAudioBinder.getDuration()));
         mProgressSb.setProgress(progress);
         mHandler.sendEmptyMessageDelayed(WHAT_UPDATE_PROGRESS, 1000);
+    }
+
+    private void updateLyric() {
+        mLyricView.roll(mAudioBinder.getCurrentPosition(), mAudioBinder.getDuration());
+        mHandler.sendEmptyMessageDelayed(WHAT_UPDATE_LYRIC, 200);
     }
 
     @Override
@@ -236,11 +253,13 @@ public class AudioActivity extends BaseActivity {
                     mProgressSb.setMax(mediaFile.duration);
 
                     updateProgress();
+                    updateLyric();
                     break;
                 case AudioService.ACTION_AUDIO_COMPLETION:
                     updatePlayIvImageResource();
 
                     mHandler.removeMessages(WHAT_UPDATE_PROGRESS);
+                    mHandler.removeMessages(WHAT_UPDATE_LYRIC);
 
                     mTimeTv.setText(StringUtil.formatTime(mediaFile.duration) + "/" + StringUtil.formatTime(mediaFile.duration));
                     mProgressSb.setProgress(mediaFile.duration);

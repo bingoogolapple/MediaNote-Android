@@ -11,6 +11,7 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
+import cn.bingoogolapple.media.model.Lyric;
 import cn.bingoogolapple.media.util.UIUtil;
 
 /**
@@ -20,15 +21,18 @@ import cn.bingoogolapple.media.util.UIUtil;
  */
 public class LyricView extends TextView {
     private static final String TAG = LyricView.class.getSimpleName();
-    private static final int DEFAULT_LINE_COUNT = 3;
+    private static final int DEFAULT_LINE_COUNT = 6;
     private int mLightColor = Color.parseColor("#008D14");
     private int mDefaultColor = Color.parseColor("#FFFFFF");
     private int mLightTextSize;
     private int mDefaultTextSize;
     private Paint mPaint;
-    private List<String> mLyrics;
+    private List<Lyric> mLyrics;
     private int mLightIndex;
     private int mLineSpacing;
+
+    private long mCurrentAudioPosition;
+    private long mTotalDuration;
 
     public LyricView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -44,10 +48,10 @@ public class LyricView extends TextView {
         mLineSpacing = UIUtil.sp2px(getContext(), 5);
 
         mLyrics = new ArrayList<>();
-        for (int i = 0; i < 10; i++) {
-            mLyrics.add("我是静态歌词" + i);
+        for (int i = 0; i < 50; i++) {
+            mLyrics.add(new Lyric("我是静态歌词" + i, i * 2000));
         }
-        mLightIndex = 2;
+//        mLightIndex = 2;
     }
 
     @Override
@@ -57,13 +61,24 @@ public class LyricView extends TextView {
         // 1 绘制高亮歌词
         mPaint.setColor(mLightColor);
         mPaint.setTextSize(mLightTextSize);
-        String lyric = mLyrics.get(mLightIndex);
-        Rect lyricRect = getTextRect(lyric);
+        Lyric lyric = mLyrics.get(mLightIndex);
+        Rect lyricRect = getTextRect(lyric.content);
+        float lineHeight = lyricRect.height() + mLineSpacing;
+
+        long lightDuration;
+        if (mLightIndex == mLyrics.size() - 1) {
+            lightDuration = mTotalDuration - lyric.startPoint;
+        } else {
+            lightDuration = mLyrics.get(mLightIndex + 1).startPoint - lyric.startPoint;
+        }
+        float perecent = (mCurrentAudioPosition - lyric.startPoint) * 1.0f / lightDuration;
+        float offsetY = perecent * lineHeight;
+        canvas.translate(0, -offsetY);
+
         float lightY = getHeight() / 2 + lyricRect.height() / 2;
-        drawHorizontalCenterText(canvas, lyric, lyricRect.width(), lightY);
+        drawHorizontalCenterText(canvas, lyric.content, lyricRect.width(), lightY);
 
         // 2 绘制默认歌词
-        float lineHeight = lyricRect.height() + mLineSpacing;
         mPaint.setColor(mDefaultColor);
         mPaint.setTextSize(mDefaultTextSize);
 
@@ -85,12 +100,12 @@ public class LyricView extends TextView {
     }
 
     private void drawDefaultText(Canvas canvas, float lightY, float lineHeight, int startI, int endI) {
-        String lyric;
+        Lyric lyric;
         Rect lyricRect;
         for (int i = startI; i <= endI; i++) {
             lyric = mLyrics.get(i);
-            lyricRect = getTextRect(lyric);
-            drawHorizontalCenterText(canvas, lyric, lyricRect.width(), lightY + (i - mLightIndex) * lineHeight);
+            lyricRect = getTextRect(lyric.content);
+            drawHorizontalCenterText(canvas, lyric.content, lyricRect.width(), lightY + (i - mLightIndex) * lineHeight);
         }
     }
 
@@ -104,4 +119,25 @@ public class LyricView extends TextView {
         float x = getWidth() / 2 - lyricWidth / 2;
         canvas.drawText(lyric, x, y, mPaint);
     }
+
+    public void roll(long currentAudioPosition, long totalDuration) {
+        mCurrentAudioPosition = currentAudioPosition;
+        mTotalDuration = totalDuration;
+        for (int i = 0; i < mLyrics.size(); i++) {
+            long startPoint = mLyrics.get(i).startPoint;
+            if (i == mLyrics.size() - 1) {
+                if (mCurrentAudioPosition > startPoint) {
+                    mLightIndex = i;
+                }
+            } else {
+                long nextStartPoint = mLyrics.get(i + 1).startPoint;
+                if (mCurrentAudioPosition >= startPoint && mCurrentAudioPosition < nextStartPoint) {
+                    mLightIndex = i;
+                }
+            }
+        }
+
+        invalidate();
+    }
+
 }

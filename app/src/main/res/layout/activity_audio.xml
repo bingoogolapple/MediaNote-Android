@@ -27,7 +27,9 @@
             tools:text="音频名称" />
     </RelativeLayout>
 
-    <cn.bingoogolapple.media.ui.widget.LyricView style="@style/MatchAuto" />
+    <cn.bingoogolapple.media.ui.widget.LyricView
+        android:id="@+id/lyricView"
+        style="@style/MatchAuto" />
 
     <TextView
         android:id="@+id/tv_audio_time"
