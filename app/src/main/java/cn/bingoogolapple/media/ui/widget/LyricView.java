@@ -47,10 +47,10 @@ public class LyricView extends TextView {
         mDefaultTextSize = UIUtil.sp2px(getContext(), 13);
         mLineSpacing = UIUtil.sp2px(getContext(), 5);
 
-        mLyrics = new ArrayList<>();
-        for (int i = 0; i < 50; i++) {
-            mLyrics.add(new Lyric("我是静态歌词" + i, i * 2000));
-        }
+//        mLyrics = new ArrayList<>();
+//        for (int i = 0; i < 50; i++) {
+//            mLyrics.add(new Lyric("我是静态歌词" + i, i * 2000));
+//        }
 //        mLightIndex = 2;
     }
 
@@ -61,6 +61,14 @@ public class LyricView extends TextView {
         // 1 绘制高亮歌词
         mPaint.setColor(mLightColor);
         mPaint.setTextSize(mLightTextSize);
+
+        if (mLyrics == null) {
+            String loadingTip = "正在加载歌词";
+            Rect loadingTipRect = getTextRect(loadingTip);
+            drawHorizontalCenterText(canvas, loadingTip, loadingTipRect.width(), getHeight() / 2 + loadingTipRect.height() / 2);
+            return;
+        }
+
         Lyric lyric = mLyrics.get(mLightIndex);
         Rect lyricRect = getTextRect(lyric.content);
         float lineHeight = lyricRect.height() + mLineSpacing;
@@ -121,6 +129,9 @@ public class LyricView extends TextView {
     }
 
     public void roll(long currentAudioPosition, long totalDuration) {
+        if (mLyrics == null) {
+            return;
+        }
         mCurrentAudioPosition = currentAudioPosition;
         mTotalDuration = totalDuration;
         for (int i = 0; i < mLyrics.size(); i++) {
@@ -140,4 +151,7 @@ public class LyricView extends TextView {
         invalidate();
     }
 
+    public void setLyrics(ArrayList<Lyric> lyrics) {
+        mLyrics = lyrics;
+    }
 }

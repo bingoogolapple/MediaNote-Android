@@ -36,4 +36,8 @@ public class StringUtil {
     public static String formatSystemTime() {
         return new SimpleDateFormat("HH:mm:ss").format(new Date());
     }
+
+    public static String formatAudioName(String audioName){
+        return audioName.substring(0,audioName.lastIndexOf("."));
+    }
 }

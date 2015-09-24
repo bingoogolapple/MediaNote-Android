@@ -21,6 +21,8 @@ import cn.bingoogolapple.media.model.MediaFile;
 import cn.bingoogolapple.media.service.AudioService;
 import cn.bingoogolapple.media.ui.widget.LyricView;
 import cn.bingoogolapple.media.util.Logger;
+import cn.bingoogolapple.media.util.LyricLoader;
+import cn.bingoogolapple.media.util.LyricParser;
 import cn.bingoogolapple.media.util.StringUtil;
 import cn.bingoogolapple.titlebar.BGATitlebar;
 
@@ -251,6 +253,8 @@ public class AudioActivity extends BaseActivity {
 
                     mTimeTv.setText("00:00/" + StringUtil.formatTime(mediaFile.duration));
                     mProgressSb.setMax(mediaFile.duration);
+
+                    mLyricView.setLyrics(LyricParser.parseLyricFromFile(LyricLoader.loadLyricFile(mediaFile.name)));
 
                     updateProgress();
                     updateLyric();
