@@ -1,5 +1,6 @@
 package cn.bingoogolapple.media.ui.activity;
 
+import android.Manifest;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -9,16 +10,43 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.view.View;
 
+import java.util.List;
+
 import cn.bingoogolapple.bgaindicator.BGAFixedIndicator;
 import cn.bingoogolapple.media.R;
 import cn.bingoogolapple.media.ui.fragment.AudioFragment;
 import cn.bingoogolapple.media.ui.fragment.VideoFragment;
+import pub.devrel.easypermissions.AfterPermissionGranted;
+import pub.devrel.easypermissions.EasyPermissions;
 
-public class MainActivity extends BaseActivity {
+public class MainActivity extends BaseActivity implements EasyPermissions.PermissionCallbacks {
     private BGAFixedIndicator mIndicator;
     private ViewPager mContentVp;
     private AudioFragment mAudioFragment;
     private VideoFragment mVideoFragment;
+
+    // 处理 Android 6.0 的权限获取
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this);
+    }
+
+    @Override
+    public void onPermissionsGranted(int requestCode, List<String> perms) {
+    }
+
+    @Override
+    public void onPermissionsDenied(int requestCode, List<String> perms) {
+    }
+
+    @AfterPermissionGranted(1)
+    private void conversationWrapper() {
+        String[] perms = {Manifest.permission.READ_EXTERNAL_STORAGE};
+        if (EasyPermissions.hasPermissions(this, perms)) {
+        } else {
+            EasyPermissions.requestPermissions(this, "", 1, perms);
+        }
+    }
 
     @Override
     protected void initView(Bundle savedInstanceState) {
@@ -36,6 +64,8 @@ public class MainActivity extends BaseActivity {
     protected void processLogic(Bundle savedInstanceState) {
         mContentVp.setAdapter(new ContentAdapter(getSupportFragmentManager()));
         mIndicator.initData(0, mContentVp);
+
+        conversationWrapper();
     }
 
     @Override
